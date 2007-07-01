@@ -37,6 +37,24 @@ class Genome:
          self.load(file)
          file.close()
 
+   def copyFrom(self, other):
+      self.phenotype = other.phenotype
+
+      if other.neurons is not None:
+         self.neurons = list(other.neurons)
+      else:
+         self.neurons = []
+
+      if other.genes is not None:
+         self.genes = list(other.genes)
+      else:
+         self.genes = []
+
+      if other.traits is not None:
+         self.traits = list(other.traits)
+      else:
+         self.traits = []
+
    def load(self, file):
       for line in file.readlines():
          if not line.startswith('/*'):

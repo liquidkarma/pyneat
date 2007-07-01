@@ -144,13 +144,13 @@ class Population:
             if bestSpecie is not None:
                bestSpecie.expectedOffspring = numOrganisms
 
-      startTime = time.clock()
+      #startTime = time.clock()
 
       sortedSpecies = list(self.species)
       sortedSpecies.sort()
 
-      endTime = time.clock()
-      print 'sort time:', (endTime - startTime)
+      #endTime = time.clock()
+      #print 'sort time:', (endTime - startTime)
 
       bestSpeciesId = sortedSpecies[0].id
 

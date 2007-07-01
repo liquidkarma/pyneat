@@ -4,9 +4,9 @@ import random
 from Configuration import *
 from Mutator       import *
 from Organism      import *
+from Genome        import *
 from Crossover     import *
 from random_utils  import *
-from NEATCopy      import objectCopy
 
 class Species:
    def __init__(self, id, novel=False):
@@ -109,9 +109,9 @@ class Species:
             mateBaby            = False
 
             if champion.superChampionOffspring > 0:
-               mom          = champion
-               newGenome    = objectCopy(mom.genome)
-               newGenome.id = i
+               mom       = champion
+               newGenome = Genome(i)
+               newGenome.copyFrom(mom.genome)
 
                if champion.superChampionOffspring > 1:
                   if randfloat() < 0.8 or Configuration.mutateAddSynapseProbability == 0.0:
@@ -131,16 +131,17 @@ class Species:
                champion.superChampionOffspring -= 1
 
             elif not championDone and self.expectedOffspring > 5:
-               mom          = champion
-               newGenome    = objectCopy(mom.genome)
-               newGenome.id = i
+               mom       = champion
+               newGenome = Genome(i)
+               newGenome.copyFrom(mom.genome)
+
                baby         = Organism(0.0, newGenome, generation)
                championDone = True
 
             elif poolSize == 0 or randfloat() < Configuration.mutateOnlyProbability:
                mom          = self.organisms[random.randint(0, poolSize)]
-               newGenome    = objectCopy(mom.genome)
-               newGenome.id = i
+               newGenome    = Genome(i)
+               newGenome.copyFrom(mom.genome)
 
                if randfloat() < Configuration.mutateAddNeuronProbability:
                   newGenome.mutateAddNeuron(population.currentNeuronId, population.currentInnovation, population.innovations)
