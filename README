@@ -1,0 +1,22 @@
+The NEAT software is based on the NeuroEvolution of Augmenting Topologies
+method of evolving artificial neural networks, by Stanley and
+Miikkulainen (2001). Papers describing the method and some associated
+findings are available at:
+
+http://www.cs.utexas.edu/users/kstanley
+
+Also, see:
+http://www.cs.utexas.edu/users/nn/pages/research/ne-methods.html#NEAT
+
+Ken Stanley's UCF homepage:
+http://www.cs.ucf.edu/~kstanley
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License version 2 as published
+by the Free Software Foundation. This program is distributed in the hope
+that it will be useful, but without any warranty; without even the
+implied warranty of merchantability or fitness for a particular purpose.
+See the GNU General Public License for more details.
+
+This package is currently in the pre-alpha state. The implementation should be
+done, but there are probably lots of bugs and it really needs to be optimized.

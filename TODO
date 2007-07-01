@@ -1,0 +1,7 @@
+* configuration for dumping overall champion to a file everytime a new champion is discovered
+* try to get rid of deepcopy use
+   * should be able to use contructors as copy
+      * e.g. newList = list(oldList)
+* more examples
+* testing
+* optimize

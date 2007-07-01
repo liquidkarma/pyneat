@@ -1,0 +1,11 @@
+The python linda package is available here:
+http://www-users.cs.york.ac.uk/~aw/pylinda
+
+Start the master server:
+./linda_server --daemon &
+
+On each client system, attach to the master server:
+./linda_server -c<IP> --daemon &
+Where <IP> is the IP address of the master server
+
+
