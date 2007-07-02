@@ -6,6 +6,7 @@ import pyNEAT
 
 class XORTest(pyNEAT.Experiment):
    def __init__(self):
+      pyNEAT.Experiment.__init__(self, 'XOR')
       self.inputs  = [[1.0, 0.0, 0.0], [1.0, 0.0, 1.0], [1.0, 1.0, 0.0], [1.0, 1.0, 1.0]]
       self.targets = [0.0, 1.0, 1.0, 0.0]
 
@@ -35,15 +36,12 @@ class XORTest(pyNEAT.Experiment):
       error   = errorSum
 
       if printNetwork:
-         network.display(True)
-         for i in range(len(self.targets)):
-            print '\t', outputs[i], '->', self.targets[i]
+         self.displayNetwork(network, True)
+         self.displayOutputs(outputs)
 
       return fitness, error, winner
 
 if __name__ == '__main__':
    xorTest = XORTest()
-   print "START XOR TEST"
    xorTest.run('xorstartgenes')
    #profile.run("xorTest.run('xorstartgenes', 1)")
-   print "END XOR TEST"

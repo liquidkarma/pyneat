@@ -3,23 +3,29 @@ import time
 from Configuration import *
 from Genome        import *
 from Population    import *
+from ExperimentGUI import *
 
 class Experiment:
-   def __init__(self):
-      pass
+   def __init__(self, name):
+      self.gui  = ExperimentGUI()
+      self.name = name
 
    def run(self, startGenesFileName, generations=Configuration.numGenerations):
+      self.gui.startTest(self.name)
+
       startGenome = Genome(fileName=startGenesFileName)
 
       for i in range(Configuration.numRuns):
-         print "Run:", i
+         self.gui.setRun(i)
          self.population = Population(startGenome)
          for generation in range(generations):
-            print "Generation:", generation
+            self.gui.setGeneration(generation)
             startTime = time.clock()
             self.epoch(generation)
             endTime = time.clock()
-            print "Time:", (endTime - startTime)
+            self.gui.setGenerationTime(endTime - startTime)
+
+      self.gui.endTest(self.name)
 
    def epoch(self, generation):
       winner = False
@@ -40,11 +46,17 @@ class Experiment:
 
       self.population.epoch(generation)
 
-      print 'Highest fitness:', self.population.highestFitness
+      self.gui.setHighestFitness(self.population.highestFitness)
       self.evaluate(self.population.champion.network, True)
 
       if winner:
-         print "Found winner"
+         self.gui.winnerFound()
+
+   def displayNetwork(self, network, showWeights=False):
+      self.gui.displayNetwork(network, showWeights)
+
+   def displayOutputs(self, outputs):
+      self.gui.displayOutputs(self.targets, outputs)
 
    def evaluate(self):
       raise NotImplementedError, 'Please override the \'evaluate\' method in your experiment class'

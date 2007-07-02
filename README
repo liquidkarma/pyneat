@@ -18,5 +18,7 @@ that it will be useful, but without any warranty; without even the
 implied warranty of merchantability or fitness for a particular purpose.
 See the GNU General Public License for more details.
 
-This package is currently in the pre-alpha state. The implementation should be
+This package is currently in an alpha state. The implementation should be
 done, but there are probably lots of bugs and it really needs to be optimized.
+There are also lots of extra features left to be added from the various papers
+published about this method.

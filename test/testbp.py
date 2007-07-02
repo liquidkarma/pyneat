@@ -117,7 +117,6 @@ class XORTest:
       fitness = (10.0 - rmse) ** 2
 
       if show:
-         #self.nn.display(True)
          print 'sse =', sse
          print 'rmse =', rmse
          print 'me =', me
