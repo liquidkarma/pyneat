@@ -6,7 +6,7 @@ import pyNEAT
 
 class XORTest(pyNEAT.Experiment):
    def __init__(self):
-      pyNEAT.Experiment.__init__(self, 'XOR')
+      pyNEAT.Experiment.__init__(self, 'XOR', 'xorstartgenes')
       self.inputs  = [[1.0, 0.0, 0.0], [1.0, 0.0, 1.0], [1.0, 1.0, 0.0], [1.0, 1.0, 1.0]]
       self.targets = [0.0, 1.0, 1.0, 0.0]
 
@@ -43,5 +43,6 @@ class XORTest(pyNEAT.Experiment):
 
 if __name__ == '__main__':
    xorTest = XORTest()
-   xorTest.run('xorstartgenes')
-   #profile.run("xorTest.run('xorstartgenes', 1)")
+   #xorTest.run()
+   xorTest.runUI()
+   #profile.run("xorTest.run()")
