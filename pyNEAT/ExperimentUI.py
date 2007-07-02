@@ -7,7 +7,26 @@ try:
 except:
    graphicsAvailable = False
 
-class ExperimentConsoleUI:
+class ExperimentUIBase:
+   def run(self):
+      self.running = True
+
+      self.startTest(self.experiment.name)
+
+      for run in self.experiment.getRuns():
+         self.setRun(run.id)
+         self.setGeneration(run.generation)
+         self.setWinner(run.winner)
+         self.setHighestFitness(run.fitness)
+         self.setGenerationTime(run.time)
+
+         if not self.running:
+            print 'Experiment terminated'
+            break
+
+      self.endTest(self.experiment.name)
+
+class ExperimentConsoleUI(ExperimentUIBase):
    def __init__(self, experiment):
       self.experiment = experiment
 
@@ -23,8 +42,8 @@ class ExperimentConsoleUI:
    def setHighestFitness(self, fitness):
       print 'Highest fitness:', fitness
 
-   def winnerFound(self):
-      print 'Found winner'
+   def setWinner(self, winner):
+      print 'Found winner:', winner
 
    def displayNetwork(self, network, showWeights):
       print 'Network', network.id
@@ -45,9 +64,6 @@ class ExperimentConsoleUI:
    def endTest(self, name):
       print 'END TEST:', name
 
-   def run(self):
-      raise NotImplementedError, 'This UI is not interactive'
-
 if graphicsAvailable:
    import threading
 
@@ -60,10 +76,11 @@ if graphicsAvailable:
          self.generationLabel     = self._makeLabel('Generation:')
          self.generationTimeLabel = self._makeLabel('Time:')
          self.highestFitness      = self._makeLabel('Highest fitness:')
+         self.winner              = self._makeLabel('Winner:')
 
       def _makeLabel(self, text):
          label = Tkinter.Label(self, text=text, bd=1, relief=Tkinter.SUNKEN, anchor=Tkinter.W)
-         label.pack(side=Tkinter.LEFT)
+         label.pack(side=Tkinter.LEFT, fill=Tkinter.X, expand=1)
          return label
 
       def _setLabel(self, label, text):
@@ -87,6 +104,12 @@ if graphicsAvailable:
 
       def setHighestFitness(self, fitness):
          self._setLabel(self.highestFitness, 'Highest fitness: %f' % fitness)
+
+      def setWinner(self, winner):
+         if winner is not None:
+            self._setLabel(self.winner, 'Winner: %d' % winner)
+         else:
+            self._setLabel(self.winner, 'Winner: None')
 
    class MyDialog(tkSimpleDialog.Dialog):
       def body(self, master):
@@ -116,7 +139,7 @@ if graphicsAvailable:
       def apply(self):
          self.result = self.first, self.second
 
-   class ExperimentGUI:
+   class ExperimentGUI(ExperimentUIBase):
       def __init__(self, experiment):
          self.experiment = experiment
          self.running    = False
@@ -197,14 +220,13 @@ if graphicsAvailable:
 
       def doRun(self):
          if not self.running:
-            self.running = True
             self.runButton.config(text='Stop')
-            self.thread = threading.Thread(target=self.experiment.run)
+            #ExperimentUIBase.run(self)
+            self.thread = threading.Thread(target=ExperimentUIBase.run, args=(self,))
             self.thread.start()
          else:
             self.running = False
-            self.runButton.config(text='Run')
-            # TODO: actually stop the experiment
+            self.runButton.config(text='Stopping', state=Tkinter.DISABLED)
 
       def setRun(self, run):
          self.status.setRun(run)
@@ -218,11 +240,69 @@ if graphicsAvailable:
       def setHighestFitness(self, fitness):
          self.status.setHighestFitness(fitness)
 
-      def winnerFound(self):
-         #tkMessageBox.showinfo('Winner', 'Found winner')
-         print 'Found winner'
+      def setWinner(self, winner):
+         self.status.setWinner(winner)
+
+      def getMaxDepth(self, synapse):
+         depth = 0
+         if synapse.input:
+            maxDepth = 0
+            for synapse in synapse.input.synapses:
+               parentDepth = getMaxDepth(synapse)
+               if parentDepth > maxDepth:
+                  maxDepth = parentDepth
+            depth = maxDepth + 1
+
+         return depth
 
       def displayNetwork(self, network, showWeights):
+         self.canvas.delete(self.canvas.find_all())
+
+         canvasWidth  = self.canvas.winfo_width()
+         canvasHeight = self.canvas.winfo_height()
+
+         neurons     = {}
+         connections = []
+         for neuron in network.allNeurons:
+            depth = 0
+            for synapse in neuron.synapses:
+               connections.append((synapse.input.id, synapse.weight, neuron.id))
+               thisDepth = self.getMaxDepth(synapse)
+               if thisDepth > depth:
+                  depth = thisDepth
+            if depth not in neurons:
+               neurons[depth] = []
+            neurons[depth].append(neuron.id)
+
+         numLayers = len(neurons)
+
+         maxLength = 0
+         for depth, ids in neurons.iteritems():
+            if len(ids) > maxLength:
+               maxLength = len(ids)
+
+         neuronDiameter = canvasWidth / maxLength
+
+         coords = {}
+         yDelta = canvasHeight / numLayers
+         y      = canvasHeight - (yDelta + neuronDiameter) / 2
+         for depth, ids, in neurons.iteritems():
+            ids.sort()
+            xDelta = canvasWidth / len(ids)
+            x      = (xDelta - neuronDiameter) / 2;
+            for id in ids:
+               coords[id] = (x + neuronDiameter / 2, y)
+               self.canvas.create_oval(x, y, x + neuronDiameter - 1, y + neuronDiameter - 1, fill='red')
+               self.canvas.create_text(x + neuronDiameter / 2, y + neuronDiameter / 2, text=id)
+               x += xDelta
+            y -= yDelta
+
+         for inputId, weight, outputId in connections:
+            x0, y0 = coords[inputId]
+            x1, y1 = coords[outputId]
+            y1 += neuronDiameter
+            self.canvas.create_line(x0, y0, x1, y1, width=5)
+
          print 'Network', network.id
          for neuron in network.allNeurons:
             for synapse in neuron.synapses:
@@ -241,9 +321,9 @@ if graphicsAvailable:
 
       def endTest(self, name):
          self.status.setRunning(False)
+         self.runButton.config(text='Run', state=Tkinter.ACTIVE)
 
       def run(self):
-         #self.experiment.run()
          self.root.mainloop()
 
    ExperimentUI = ExperimentGUI

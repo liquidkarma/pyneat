@@ -5,47 +5,45 @@ from Genome        import *
 from Population    import *
 from ExperimentUI  import *
 
+class Run:
+   def __init__(self, id, generation):
+      self.id         = id
+      self.generation = generation
+
 class Experiment:
-   def __init__(self, name, start_genes_filename=None, ui=ExperimentUI):
+   def __init__(self, name, start_genes_filename=None, generations=Configuration.numGenerations, ui=ExperimentUI):
       self.name               = name
       self.startGenesFileName = start_genes_filename
+      self.generations        = generations
       self.ui                 = ui(self)
-      self.uiRunning          = False
 
-   def runUI(self):
-      self.uiRunning = True
-      self.ui.run()
-      self.uiRunning = False
-
-   def run(self, startGenesFileName=None, generations=Configuration.numGenerations):
-      if not self.uiRunning:
+   def run(self, useGUI=False):
+      if not useGUI:
          self.oldUI = self.ui
          self.ui    = ExperimentConsoleUI(self)
 
-      self.ui.startTest(self.name)
+      self.ui.run()
 
-      if startGenesFileName is None:
-         startGenome = Genome(fileName=self.startGenesFileName)
-      else:
-         startGenome = Genome(fileName=startGenesFileName)
-
-      for i in range(Configuration.numRuns):
-         self.ui.setRun(i)
-         self.population = Population(startGenome)
-         for generation in range(generations):
-            self.ui.setGeneration(generation)
-            startTime = time.clock()
-            self.epoch(generation)
-            endTime = time.clock()
-            self.ui.setGenerationTime(endTime - startTime)
-
-      self.ui.endTest(self.name)
-
-      if not self.uiRunning:
+      if not useGUI:
          self.ui = self.oldUI
 
-   def epoch(self, generation):
-      winner = False
+   def getRuns(self):
+      startGenome = Genome(fileName=self.startGenesFileName)
+
+      for i in range(Configuration.numRuns):
+         self.population = Population(startGenome)
+         for generation in range(self.generations):
+            run = Run(i, generation)
+
+            startTime = time.clock()
+            self.epoch(generation, run)
+            endTime = time.clock()
+
+            run.time = endTime - startTime
+            yield run
+
+   def epoch(self, generation, run):
+      run.winner = None
 
       for organism in self.population.organisms:
          fitness, error, won = self.evaluate(organism.network)
@@ -55,7 +53,7 @@ class Experiment:
          organism.winner  = won
 
          if won:
-            winner = True
+            run.winner = organism.network.id
 
       for specie in self.population.species:
          specie.getAverageFitness()
@@ -63,11 +61,10 @@ class Experiment:
 
       self.population.epoch(generation)
 
-      self.ui.setHighestFitness(self.population.highestFitness)
       self.evaluate(self.population.champion.network, True)
 
-      if winner:
-         self.ui.winnerFound()
+      run.champion = self.population.champion.network
+      run.fitness  = self.population.highestFitness
 
    def displayNetwork(self, network, showWeights=False):
       self.ui.displayNetwork(network, showWeights)

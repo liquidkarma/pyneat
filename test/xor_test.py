@@ -43,6 +43,5 @@ class XORTest(pyNEAT.Experiment):
 
 if __name__ == '__main__':
    xorTest = XORTest()
-   xorTest.run()
-   #xorTest.runUI()
+   xorTest.run(useGUI=True)
    #profile.run("xorTest.run()")
