@@ -2,14 +2,12 @@
 * try to get rid of deepcopy use
    * should be able to use contructors as copy
       * e.g. newList = list(oldList)
+* gui
+   - recurrant connection drawing
+   - text weight on connection lines
+   - open existing network file for display
+   - open/load start genes
+   - should be able to monitor/control parallel jobs through Linda
 * more examples
 * testing
 * optimize
-* gui
-   - should be able to monitor/control parallel jobs through Linda
-   - multiple lines indicating multiple connections
-   - recurrant connection drawing
-   - line width indicating weight
-   - text weight on connection lines
-   - open existing network file for display
-   - load start genes

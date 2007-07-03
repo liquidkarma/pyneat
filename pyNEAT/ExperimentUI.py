@@ -222,7 +222,7 @@ if graphicsAvailable:
          if synapse.input:
             maxDepth = 0
             for synapse in synapse.input.synapses:
-               parentDepth = getMaxDepth(synapse)
+               parentDepth = self.getMaxDepth(synapse)
                if parentDepth > maxDepth:
                   maxDepth = parentDepth
             depth = maxDepth + 1
