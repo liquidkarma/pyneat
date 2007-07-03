@@ -257,8 +257,10 @@ if graphicsAvailable:
             if len(ids) > maxLength:
                maxLength = len(ids)
 
-         #neuronDiameter = canvasWidth / maxLength
-         neuronDiameter = canvasHeight / (numLayers + numLayers - 1)
+         if maxLength > numLayers:
+            neuronDiameter = canvasWidth / (maxLength + maxLength - 1)
+         else:
+            neuronDiameter = canvasHeight / (numLayers + numLayers - 1)
 
          coords = {}
          yDelta = canvasHeight / numLayers
@@ -294,9 +296,9 @@ if graphicsAvailable:
                usedConnections[(inputId, outputId)] += 1
                xi = (x0 + x1) / 2 + (width + width) * (-1 ** count);
                yi = (y0 + y1) / 2 + (width + width) * (-1 ** count);
-               self.canvas.create_line(x0, y0, xi, yi, x1, y1, width=width, stipple=stipple, smooth=True)
+               self.canvas.create_line(x0, y0, xi, yi, x1, y1, width=width, stipple=stipple, smooth=True, arrow=Tkinter.LAST)
             else:
-               self.canvas.create_line(x0, y0, x1, y1, width=width, stipple=stipple)
+               self.canvas.create_line(x0, y0, x1, y1, width=width, stipple=stipple, arrow=Tkinter.LAST)
                usedConnections[(inputId, outputId)] = 1
 
          print 'Network', network.id
