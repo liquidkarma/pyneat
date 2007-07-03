@@ -1,8 +1,11 @@
 #!/usr/bin/python
 
-import math
-import profile
+## Simple XOR experiment. This should be the minimum amount of effort required
+## to create an experiment with pyNEAT.
+
 import pyNEAT
+import math
+#import profile
 
 class XORTest(pyNEAT.Experiment):
    def __init__(self):

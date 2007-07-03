@@ -80,9 +80,14 @@ class Neuron:
 
       return maxDepth
 
-   def clear(self):
+   def clear(self, seenNeurons=None):
+      if seenNeurons is None:
+         seenNeurons = [self]
+      else:
+         seenNeurons.append(self)
+
       if self.type != Neuron.INPUT:
-         for synapse in self.synapses:
-            if synapse.input != self:
-               synapse.input.clear()
          self.output = 0.0
+         for synapse in self.synapses:
+            if synapse.input not in seenNeurons:
+               synapse.input.clear(seenNeurons)

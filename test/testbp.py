@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+## This is a test case for the backprop algorithm included in pyNEAT
+
 import math
 import pyNEAT
 
