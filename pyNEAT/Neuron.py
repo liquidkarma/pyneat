@@ -65,7 +65,7 @@ class Neuron:
       return self.activate()
 
    def getMaxDepth(self, currentDepth):
-      maxDepth = 1
+      maxDepth = currentDepth
       for synapse in self.synapses:
          if synapse.input != self:
             depth = synapse.input.getMaxDepth(currentDepth + 1)

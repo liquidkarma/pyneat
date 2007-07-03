@@ -20,7 +20,7 @@ class NeuralNetwork:
    def isRecurrent(self, input, output, count, threshold):
       if count > threshold:
          return False
-      elif input == output:
+      elif input.id == output.id:
          return True
       else:
          for synapse in input.synapses:
@@ -30,7 +30,7 @@ class NeuralNetwork:
 
       return False
 
-   def display(self, showWeights=False):
+   def display(self, showWeights=True):
       print 'Network', self.id
       for neuron in self.allNeurons:
          for synapse in neuron.synapses:

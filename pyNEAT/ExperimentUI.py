@@ -246,7 +246,9 @@ if graphicsAvailable:
                   depth = thisDepth
             if depth not in neurons:
                neurons[depth] = []
-            neurons[depth].append(neuron.id)
+            # cull disconnected neurons
+            if depth > 0 or (depth == 0 and neuron in network.inputs):
+               neurons[depth].append(neuron.id)
 
          numLayers = len(neurons)
 
@@ -255,7 +257,8 @@ if graphicsAvailable:
             if len(ids) > maxLength:
                maxLength = len(ids)
 
-         neuronDiameter = canvasWidth / maxLength
+         #neuronDiameter = canvasWidth / maxLength
+         neuronDiameter = canvasHeight / (numLayers + numLayers - 1)
 
          coords = {}
          yDelta = canvasHeight / numLayers

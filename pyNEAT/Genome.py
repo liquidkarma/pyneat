@@ -71,7 +71,7 @@ class Genome:
             elif type == 'node':
                id      = int(pieces[0])
                traitId = int(pieces[1])
-               type    = int(pieces[2])
+               type    = int(pieces[2]) # wtf?
                type    = int(pieces[3])
 
                found = False
@@ -182,12 +182,11 @@ class Genome:
 
       for gene in self.genes:
          if gene.enabled:
-            input   = gene.synapse.input.analogue
-            output  = gene.synapse.output.analogue
-            synapse = Synapse(input, output, gene.synapse.weight, gene.synapse.recurrent)
+            input  = gene.synapse.input.analogue
+            output = gene.synapse.output.analogue
+            Synapse(input, output, gene.synapse.weight, gene.synapse.recurrent)
 
-      newNetwork = NeuralNetwork(id, inputs, outputs, all)
-
+      newNetwork          = NeuralNetwork(id, inputs, outputs, all)
       newNetwork.genotype = self
       self.phenotype      = newNetwork
 
