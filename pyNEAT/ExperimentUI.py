@@ -14,17 +14,17 @@ class ExperimentUIBase:
       self.startTest(self.experiment.name)
 
       for run in self.experiment.getRuns():
-         self.setRun(run.id)
-         self.setGeneration(run.generation)
-         self.setWinner(run.winner)
-         self.setHighestFitness(run.fitness)
-         self.setGenerationTime(run.time)
-         self.displayNetwork(run.champion, True)
-         self.displayOutputs(run.targets, run.outputs)
-
          if not self.running:
             print 'Experiment terminated'
             break
+         else:
+            self.setRun(run.id)
+            self.setGeneration(run.generation)
+            self.setWinner(run.winner)
+            self.setHighestFitness(run.fitness)
+            self.setGenerationTime(run.time)
+            self.displayNetwork(run.champion, True)
+            self.displayOutputs(run.targets, run.outputs)
 
       self.endTest(self.experiment.name)
 
@@ -271,7 +271,7 @@ if graphicsAvailable:
                x += xDelta
             y -= yDelta
 
-         usedConnections = []
+         usedConnections = {}
          for inputId, weight, outputId in connections:
             x0, y0 = coords[inputId]
             x1, y1 = coords[outputId]
@@ -287,12 +287,14 @@ if graphicsAvailable:
                #width   = 3
 
             if (inputId, outputId) in usedConnections:
-               xi = (x0 + x1) / 2;
-               yi = (y0 + y1) / 2;
+               count = usedConnections[(inputId, outputId)]
+               usedConnections[(inputId, outputId)] += 1
+               xi = (x0 + x1) / 2 + (width + width) * (-1 ** count);
+               yi = (y0 + y1) / 2 + (width + width) * (-1 ** count);
                self.canvas.create_line(x0, y0, xi, yi, x1, y1, width=width, stipple=stipple, smooth=True)
             else:
                self.canvas.create_line(x0, y0, x1, y1, width=width, stipple=stipple)
-               usedConnections.append((inputId, outputId))
+               usedConnections[(inputId, outputId)] = 1
 
          print 'Network', network.id
          for neuron in network.allNeurons:
