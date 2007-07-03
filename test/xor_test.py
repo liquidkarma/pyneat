@@ -10,7 +10,7 @@ class XORTest(pyNEAT.Experiment):
       self.inputs  = [[1.0, 0.0, 0.0], [1.0, 0.0, 1.0], [1.0, 1.0, 0.0], [1.0, 1.0, 1.0]]
       self.targets = [0.0, 1.0, 1.0, 0.0]
 
-   def evaluate(self, network, printNetwork=False):
+   def evaluate(self, network):
       networkDepth = network.getMaxDepth()
 
       outputs = []
@@ -35,11 +35,7 @@ class XORTest(pyNEAT.Experiment):
       fitness = (4.0 - errorSum) ** 2
       error   = errorSum
 
-      if printNetwork:
-         self.displayNetwork(network, True)
-         self.displayOutputs(outputs)
-
-      return fitness, error, winner
+      return fitness, outputs, error, winner
 
 if __name__ == '__main__':
    xorTest = XORTest()

@@ -5,3 +5,11 @@
 * more examples
 * testing
 * optimize
+* gui
+   - should be able to monitor/control parallel jobs through Linda
+   - multiple lines indicating multiple connections
+   - recurrant connection drawing
+   - line width indicating weight
+   - text weight on connection lines
+   - open existing network file for display
+   - load start genes

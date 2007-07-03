@@ -46,7 +46,7 @@ class Experiment:
       run.winner = None
 
       for organism in self.population.organisms:
-         fitness, error, won = self.evaluate(organism.network)
+         fitness, outputs, error, won = self.evaluate(organism.network)
 
          organism.fitness = fitness
          organism.error   = error
@@ -61,10 +61,12 @@ class Experiment:
 
       self.population.epoch(generation)
 
-      self.evaluate(self.population.champion.network, True)
+      fitness, outputs, error, won = self.evaluate(self.population.champion.network)
 
       run.champion = self.population.champion.network
       run.fitness  = self.population.highestFitness
+      run.targets  = self.targets
+      run.outputs  = outputs
 
    def displayNetwork(self, network, showWeights=False):
       self.ui.displayNetwork(network, showWeights)
@@ -72,5 +74,5 @@ class Experiment:
    def displayOutputs(self, outputs):
       self.ui.displayOutputs(self.targets, outputs)
 
-   def evaluate(self):
+   def evaluate(self, network, printNetwork=False):
       raise NotImplementedError, 'Please override the \'evaluate\' method in your experiment class'

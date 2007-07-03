@@ -19,6 +19,8 @@ class ExperimentUIBase:
          self.setWinner(run.winner)
          self.setHighestFitness(run.fitness)
          self.setGenerationTime(run.time)
+         self.displayNetwork(run.champion, True)
+         self.displayOutputs(run.targets, run.outputs)
 
          if not self.running:
             print 'Experiment terminated'
@@ -111,34 +113,6 @@ if graphicsAvailable:
          else:
             self._setLabel(self.winner, 'Winner: None')
 
-   class MyDialog(tkSimpleDialog.Dialog):
-      def body(self, master):
-         Tkinter.Label(master, text='First:').grid(row=0, sticky=Tkinter.W)
-         Tkinter.Label(master, text='Second:').grid(row=1, sticky=Tkinter.W)
-
-         self.e1 = Tkinter.Entry(master)
-         self.e2 = Tkinter.Entry(master)
-
-         self.e1.grid(row=0, column=1)
-         self.e2.grid(row=1, column=1)
-
-         self.cb = Tkinter.Checkbutton(master, text='Hardcopy')
-         self.cb.grid(row=2, columnspan=2, sticky=Tkinter.W)
-
-         return self.e1
-
-      def validate(self):
-         try:
-            self.first  = int(self.e1.get())
-            self.second = int(self.e2.get())
-            return 1
-         except ValueError:
-            tkMessageBox.showerror('Bad Input', 'Illegal values, please try again')
-            return 0
-
-      def apply(self):
-         self.result = self.first, self.second
-
    class ExperimentGUI(ExperimentUIBase):
       def __init__(self, experiment):
          self.experiment = experiment
@@ -161,8 +135,8 @@ if graphicsAvailable:
          fileMenu = Tkinter.Menu(menu)
          menu.add_cascade(label='File', menu=fileMenu)
 
-         fileMenu.add_command(label='Open...', command=self.openNetwork)
-         fileMenu.add_separator()
+         #fileMenu.add_command(label='Open...', command=self.openNetwork)
+         #fileMenu.add_separator()
          fileMenu.add_command(label='Exit', command=self.root.quit)
 
          helpMenu = Tkinter.Menu(menu)
@@ -256,7 +230,7 @@ if graphicsAvailable:
          return depth
 
       def displayNetwork(self, network, showWeights):
-         self.canvas.delete(self.canvas.find_all())
+         self.canvas.delete(Tkinter.ALL)
 
          canvasWidth  = self.canvas.winfo_width()
          canvasHeight = self.canvas.winfo_height()
@@ -297,11 +271,28 @@ if graphicsAvailable:
                x += xDelta
             y -= yDelta
 
+         usedConnections = []
          for inputId, weight, outputId in connections:
             x0, y0 = coords[inputId]
             x1, y1 = coords[outputId]
+
             y1 += neuronDiameter
-            self.canvas.create_line(x0, y0, x1, y1, width=5)
+
+            width = 5
+            if weight > 0:
+               stipple = ''
+               #width   = int(abs(2 * weight))
+            else:
+               stipple = 'gray25'
+               #width   = 3
+
+            if (inputId, outputId) in usedConnections:
+               xi = (x0 + x1) / 2;
+               yi = (y0 + y1) / 2;
+               self.canvas.create_line(x0, y0, xi, yi, x1, y1, width=width, stipple=stipple, smooth=True)
+            else:
+               self.canvas.create_line(x0, y0, x1, y1, width=width, stipple=stipple)
+               usedConnections.append((inputId, outputId))
 
          print 'Network', network.id
          for neuron in network.allNeurons:
