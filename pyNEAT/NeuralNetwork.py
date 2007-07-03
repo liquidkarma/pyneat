@@ -42,7 +42,7 @@ class NeuralNetwork:
    def getMaxDepth(self):
       maxDepth = 0
       for output in self.outputs:
-         depth = output.getMaxDepth(0)
+         depth = output.getMaxDepth()
          if depth > maxDepth:
             maxDepth = depth
       return maxDepth

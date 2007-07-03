@@ -37,23 +37,34 @@ class Genome:
          self.load(file)
          file.close()
 
-   def copyFrom(self, other):
-      self.phenotype = other.phenotype
+   def makeCopy(self, id):
+      genome = Genome(id)
 
-      if other.neurons is not None:
-         self.neurons = list(other.neurons)
-      else:
-         self.neurons = []
+      genome.neurons = []
+      if self.neurons is not None:
+         for neuron in self.neurons:
+            copy = Neuron(neuron.id, neuron.type, active=neuron.active, trait=neuron.trait)
+            genome.neurons.append(copy)
 
-      if other.genes is not None:
-         self.genes = list(other.genes)
-      else:
-         self.genes = []
+      genome.genes = []
+      if self.genes is not None:
+         for gene in self.genes:
+            input  = None
+            output = None
+            for neuron in genome.neurons:
+               if neuron.id == gene.input.id:
+                  input = neuron
+               if neuron.id == gene.output.id:
+                  output = neuron
+               if input is not None and output is not None:
+                  break
+            if input is not None and output is not None:
+               genome.genes.append(Gene(input, output, gene.synapse.weight, gene.synapse.recurrent, gene.synapse.trait, gene.enabled, gene.mutation, gene.innovation))
 
-      if other.traits is not None:
-         self.traits = list(other.traits)
-      else:
-         self.traits = []
+      # XXX: copying reference
+      genome.traits = self.traits
+
+      return genome
 
    def load(self, file):
       for line in file.readlines():
@@ -546,8 +557,6 @@ class Genome:
 
       blxPos = randfloat()
 
-      averageGene = Gene()
-
       momBetter = True
       if momFitness < dadFitness or (momFitness == dadFitness and len(dad.genes) < len(self.genes)):
          momBetter = False
@@ -576,8 +585,6 @@ class Genome:
          skip       = False
          chosenGene = None
          disabled   = False
-
-         averageGene.enabled = True
 
          if momIndex == momStopIndex:
             chosenGene = dadGenes[dadIndex]
@@ -619,10 +626,17 @@ class Genome:
                         useAverage = True
 
                   if useAverage:
+                     enabled   = True
+                     trait     = None
+                     weight    = None
+                     input     = None
+                     output    = None
+                     recurrent = None
+
                      if randfloat() > 0.5:
-                        averageGene.synapse.trait = momGene.synapse.trait
+                        trait = momGene.synapse.trait
                      else:
-                        averageGene.synapse.trait = dadGene.synapse.trait
+                        trait = dadGene.synapse.trait
 
                      if type == Crossover.BLX:
                         blxAlpha = -0.4
@@ -647,33 +661,33 @@ class Genome:
 
                         blxRange = blxMax - blxMin
 
-                        averageGene.synapse.weight = blxMin + blxPos * blxRange
+                        weight = blxMin + blxPos * blxRange
                      else:
-                        averageGene.synapse.weight = (momGene.synapse.weight + dadGene.synapse.weight) / 2.0
+                        weight = (momGene.synapse.weight + dadGene.synapse.weight) / 2.0
 
                      if randfloat() > 0.5:
-                        averageGene.synapse.input = momGene.synapse.input
+                        input = momGene.synapse.input
                      else:
-                        averageGene.synapse.input = dadGene.synapse.input
+                        input = dadGene.synapse.input
 
                      if randfloat() > 0.5:
-                        averageGene.synapse.output = momGene.synapse.output
+                        output = momGene.synapse.output
                      else:
-                        averageGene.synapse.output = dadGene.synapse.output
+                        output = dadGene.synapse.output
 
                      if randfloat() > 0.5:
-                        averageGene.synapse.recurrent = momGene.synapse.recurrent
+                        recurrent = momGene.synapse.recurrent
                      else:
-                        averageGene.synapse.recurrent = dadGene.synapse.recurrent
+                        recurrent = dadGene.synapse.recurrent
 
-                     averageGene.innovation = momGene.innovation
-                     averageGene.mutation   = (momGene.mutation + dadGene.mutation) / 2.0
+                     innovation = momGene.innovation
+                     mutation   = (momGene.mutation + dadGene.mutation) / 2.0
 
                      if not momGene.enabled or not dadGene.enabled:
                         if randfloat() < 0.75:
-                           averageGene.enabled = False
+                           enabled = False
 
-                     chosenGene = averageGene
+                     chosenGene = Gene(input, output, weight, recurrent, trait, enabled, mutation, innovation)
 
                momIndex    += 1
                dadIndex    += 1

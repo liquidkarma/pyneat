@@ -56,8 +56,7 @@ class Experiment:
             run.winner = organism.network.id
 
       for specie in self.population.species:
-         specie.getAverageFitness()
-         specie.getMaxFitness()
+         specie.calcFitnessStats()
 
       self.population.epoch(generation)
 
@@ -67,12 +66,6 @@ class Experiment:
       run.fitness  = self.population.highestFitness
       run.targets  = self.targets
       run.outputs  = outputs
-
-   def displayNetwork(self, network, showWeights=False):
-      self.ui.displayNetwork(network, showWeights)
-
-   def displayOutputs(self, outputs):
-      self.ui.displayOutputs(self.targets, outputs)
 
    def evaluate(self, network, printNetwork=False):
       raise NotImplementedError, 'Please override the \'evaluate\' method in your experiment class'

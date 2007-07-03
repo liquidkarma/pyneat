@@ -30,6 +30,17 @@ def sigmoid_tanh(x):
 def dsigmoid_tanh(x):
    return (1.0 - x * x)
 
+# SIN SIGMOID
+def sigmoid_sin(x):
+   return math.sin(x)
+
+# COS SIGMOID
+def sigmoid_cos(x):
+   return math.cos(x)
+
+def sigmoid_gauss(x):
+   return math.exp(-1 * (x ** 2))
+
 # PLAIN SIGMOID
 def sigmoid(x):
    return (1.0 / (1.0 + math.exp(-x)))
@@ -37,6 +48,7 @@ def sigmoid(x):
 def dsigmoid(x):
    return (x * (1.0 - x))
 
+# actual activation functions used
 def activate(x, slope, constant):
    return sigmoid_nonshifted(x, slope)
 

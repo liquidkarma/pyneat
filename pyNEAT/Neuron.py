@@ -64,13 +64,20 @@ class Neuron:
    def getOutput(self):
       return self.activate()
 
-   def getMaxDepth(self, currentDepth):
+   def getMaxDepth(self, currentDepth=0, seenNeurons=None):
+      if seenNeurons is None:
+         seenNeurons = [self]
+      else:
+         seenNeurons.append(self)
+
       maxDepth = currentDepth
+
       for synapse in self.synapses:
-         if synapse.input != self:
-            depth = synapse.input.getMaxDepth(currentDepth + 1)
+         if synapse.input not in seenNeurons:
+            depth = synapse.input.getMaxDepth(currentDepth + 1, seenNeurons)
             if depth > maxDepth:
                maxDepth = depth
+
       return maxDepth
 
    def clear(self):

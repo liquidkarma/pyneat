@@ -75,19 +75,14 @@ class Species:
          for i in range(numParents + 1, numOrganisms):
             self.organisms[i].eliminated = True
 
-   def getAverageFitness(self):
+   def calcFitnessStats(self):
+      self.maxFitness = 0.0
       total = 0.0
       for organism in self.organisms:
          total += organism.fitness
-      self.aveFitness = total / len(self.organisms)
-      return self.aveFitness
-
-   def getMaxFitness(self):
-      self.maxFitness = 0.0
-      for organism in self.organisms:
          if organism.fitness > self.maxFitness:
             self.maxFitness = organism.fitness
-      return self.maxFitness
+      self.aveFitness = total / len(self.organisms)
 
    def lastImproved(self):
       return self.age - self.ageOfLastImprovement
@@ -110,8 +105,7 @@ class Species:
 
             if champion.superChampionOffspring > 0:
                mom       = champion
-               newGenome = Genome(i)
-               newGenome.copyFrom(mom.genome)
+               newGenome = mom.genome.makeCopy(i)
 
                if champion.superChampionOffspring > 1:
                   if randfloat() < 0.8 or Configuration.mutateAddSynapseProbability == 0.0:
@@ -132,16 +126,14 @@ class Species:
 
             elif not championDone and self.expectedOffspring > 5:
                mom       = champion
-               newGenome = Genome(i)
-               newGenome.copyFrom(mom.genome)
+               newGenome = mom.genome.makeCopy(i)
 
                baby         = Organism(0.0, newGenome, generation)
                championDone = True
 
             elif poolSize == 0 or randfloat() < Configuration.mutateOnlyProbability:
                mom          = self.organisms[random.randint(0, poolSize)]
-               newGenome    = Genome(i)
-               newGenome.copyFrom(mom.genome)
+               newGenome    = mom.genome.makeCopy(i)
 
                if randfloat() < Configuration.mutateAddNeuronProbability:
                   newGenome.mutateAddNeuron(population.currentNeuronId, population.currentInnovation, population.innovations)

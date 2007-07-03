@@ -1,10 +1,17 @@
 * configuration for dumping overall champion to a file everytime a new champion is discovered
+* should not consider invalid networks?
+   - networks with no connections to output
+* cull hidden nodes with no out synapses?
+   - output signal will never propagate to the output layer
 * gui
    - recurrant connection drawing
    - text weight on connection lines
    - open existing network file for display
    - open/load start genes
    - should be able to monitor/control parallel jobs through Linda
+* use python logging module for console output?
+   - possibly get rid of 'if debug' stuff
 * more examples
 * testing
 * optimize
+   - target reproduction first

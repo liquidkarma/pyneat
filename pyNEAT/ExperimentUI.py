@@ -217,18 +217,6 @@ if graphicsAvailable:
       def setWinner(self, winner):
          self.status.setWinner(winner)
 
-      def getMaxDepth(self, synapse):
-         depth = 0
-         if synapse.input:
-            maxDepth = 0
-            for synapse in synapse.input.synapses:
-               parentDepth = self.getMaxDepth(synapse)
-               if parentDepth > maxDepth:
-                  maxDepth = parentDepth
-            depth = maxDepth + 1
-
-         return depth
-
       def displayNetwork(self, network, showWeights):
          self.canvas.delete(Tkinter.ALL)
 
@@ -238,22 +226,19 @@ if graphicsAvailable:
          neurons     = {}
          connections = []
          for neuron in network.allNeurons:
-            depth = 0 # neuron.getMaxDepth(0)
+            layer = neuron.getMaxDepth()
             for synapse in neuron.synapses:
                connections.append((synapse.input.id, synapse.weight, neuron.id))
-               thisDepth = self.getMaxDepth(synapse)
-               if thisDepth > depth:
-                  depth = thisDepth
-            if depth not in neurons:
-               neurons[depth] = []
+            if layer not in neurons:
+               neurons[layer] = []
             # cull disconnected neurons
-            if depth > 0 or (depth == 0 and neuron in network.inputs):
-               neurons[depth].append(neuron.id)
+            if layer > 0 or (layer == 0 and neuron in network.inputs):
+               neurons[layer].append(neuron.id)
 
          numLayers = len(neurons)
 
          maxLength = 0
-         for depth, ids in neurons.iteritems():
+         for layer, ids in neurons.iteritems():
             if len(ids) > maxLength:
                maxLength = len(ids)
 
@@ -265,7 +250,7 @@ if graphicsAvailable:
          coords = {}
          yDelta = canvasHeight / numLayers
          y      = canvasHeight - (yDelta + neuronDiameter) / 2
-         for depth, ids, in neurons.iteritems():
+         for layer, ids, in neurons.iteritems():
             ids.sort()
             xDelta = canvasWidth / len(ids)
             x      = (xDelta - neuronDiameter) / 2;
@@ -315,6 +300,7 @@ if graphicsAvailable:
             self.outputList.insert(Tkinter.END, (outputs[i], '->', targets[i]))
 
       def startTest(self, name):
+         self.root.title('pyNEAT - ' + name)
          self.status.setRunning(True)
 
       def endTest(self, name):

@@ -41,9 +41,7 @@ class Population:
 
    def spawn(self, genome, size):
       for i in range(size):
-         newGenome           = Genome(genome.id, genome.neurons, genome.genes, genome.traits)
-         newGenome.phenotype = genome.phenotype
-         newGenome.id        = i
+         newGenome = genome.makeCopy(i)
 
          newGenome.mutateSynapseWeights(1.0, 1.0, Mutator.GAUSSIAN)
 
@@ -193,9 +191,7 @@ class Population:
       elif Configuration.babiesStolen > 0:
          stolenBabies = 0
 
-         sortedSpecies.reverse()
-
-         for specie in sortedSpecies:
+         for specie in reversed(sortedSpecies):
             if specie.age > 5 and specie.expectedOffspring > 2:
                if (specie.expectedOffspring - 1) >= (Configuration.babiesStolen - stolenBabies):
                   specie.expectedOffspring -= Configuration.babiesStolen - stolenBabies
@@ -206,9 +202,6 @@ class Population:
 
                   if stolenBabies >= Configurtion.babiesStolen:
                      break
-
-         # restore original order
-         sortedSpecies.reverse()
 
          oneFifthStolen = Configuration.babiesStolen / 5
          oneTenthStolen = Configuration.babiesStolen / 10
