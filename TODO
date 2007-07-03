@@ -1,7 +1,4 @@
 * configuration for dumping overall champion to a file everytime a new champion is discovered
-* try to get rid of deepcopy use
-   * should be able to use contructors as copy
-      * e.g. newList = list(oldList)
 * gui
    - recurrant connection drawing
    - text weight on connection lines

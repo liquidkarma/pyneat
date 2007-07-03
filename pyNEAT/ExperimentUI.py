@@ -238,7 +238,7 @@ if graphicsAvailable:
          neurons     = {}
          connections = []
          for neuron in network.allNeurons:
-            depth = 0
+            depth = 0 # neuron.getMaxDepth(0)
             for synapse in neuron.synapses:
                connections.append((synapse.input.id, synapse.weight, neuron.id))
                thisDepth = self.getMaxDepth(synapse)
