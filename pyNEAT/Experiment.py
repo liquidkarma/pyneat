@@ -43,29 +43,19 @@ class Experiment:
             yield run
 
    def epoch(self, generation, run):
-      run.winner = None
-
-      for organism in self.population.organisms:
-         fitness, outputs, error, won = self.evaluate(organism.network)
-
-         organism.fitness = fitness
-         organism.error   = error
-         organism.winner  = won
-
-         if won:
-            run.winner = organism.network.id
-
-      for specie in self.population.species:
-         specie.calcFitnessStats()
-
-      self.population.epoch(generation)
+      self.population.epoch(generation, self)
 
       fitness, outputs, error, won = self.evaluate(self.population.champion.network)
+
+      if won:
+         run.winner = self.population.champion.network.id
+      else:
+         run.winner = None
 
       run.champion = self.population.champion.network
       run.fitness  = self.population.highestFitness
       run.targets  = self.targets
       run.outputs  = outputs
 
-   def evaluate(self, network, printNetwork=False):
+   def evaluate(self, network):
       raise NotImplementedError, 'Please override the \'evaluate\' method in your experiment class'

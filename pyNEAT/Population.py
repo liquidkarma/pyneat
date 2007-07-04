@@ -84,7 +84,14 @@ class Population:
                organism.species = newSpecies
                self.species.append(newSpecies)
 
-   def epoch(self, generation):
+   def epoch(self, generation, experiment, debug=True):
+      for organism in self.organisms:
+         fitness, outputs, error, won = experiment.evaluate(organism.network)
+
+         organism.fitness = fitness
+         organism.error   = error
+         organism.winner  = won
+
       numSpecies   = len(self.species)
       numOrganisms = len(self.organisms)
 
@@ -99,6 +106,7 @@ class Population:
       #      Configuration.compatibilityThreshold = 0.3
 
       for specie in self.species:
+         specie.calcFitnessStats()
          specie.adjustFitness()
 
       totalFitness = 0
@@ -107,7 +115,8 @@ class Population:
 
       overallAverage = totalFitness / numOrganisms
 
-      print "Generation:", generation, ", Total fitness:", totalFitness, ", Overall average:", overallAverage
+      if debug:
+         print "Generation:", generation, ", Total fitness:", totalFitness, ", Overall average:", overallAverage
 
       for organism in self.organisms:
          organism.expectedOffspring = organism.fitness / overallAverage
@@ -136,7 +145,8 @@ class Population:
             finalExpected += 1
 
          if finalExpected < numOrganisms:
-            print "Population died!"
+            if debug:
+               print "Population died!"
             for specie in self.species:
                specie.expectedOffspring = 0
             if bestSpecie is not None:
@@ -152,8 +162,9 @@ class Population:
 
       bestSpeciesId = sortedSpecies[0].id
 
-      for specie in sortedSpecies:
-         print "Original fitness of species", specie.id, "( Size", len(specie.organisms), "):", specie.organisms[0].originalFitness, "last improved", (specie.age - specie.ageOfLastImprovement)
+      if debug:
+         for specie in sortedSpecies:
+            print "Original fitness of species", specie.id, "( Size", len(specie.organisms), "):", specie.organisms[0].originalFitness, "last improved", (specie.age - specie.ageOfLastImprovement)
 
       # check for population stagnation
       self.champion = sortedSpecies[0].organisms[0]
@@ -163,11 +174,13 @@ class Population:
          self.highestLastChanged = 0
       else:
          self.highestLastChanged += 1
-         print self.highestLastChanged, "generations since last population fitness record:", self.highestFitness
+         if debug:
+            print self.highestLastChanged, "generations since last population fitness record:", self.highestFitness
 
       # delta coding
       if self.highestLastChanged >= (Configuration.dropoffAge + 5):
-         print "PERFORMING DELTA CODING"
+         if debug:
+            print "PERFORMING DELTA CODING"
 
          self.highestLastChanged = 0
 
@@ -246,14 +259,16 @@ class Population:
             organism.species.removeOrganism(organism)
             self.organisms.remove(organism)
 
-      print "Reproducing"
-      startTime = time.clock()
+      if debug:
+         print "Reproducing"
+         startTime = time.clock()
 
       for specie in self.species:
          specie.reproduce(generation, self, sortedSpecies)
 
-      endTime = time.clock()
-      print "Reproduction complete (time", (endTime - startTime), ")"
+      if debug:
+         endTime = time.clock()
+         print "Reproduction complete (time", (endTime - startTime), ")"
 
       for organism in self.organisms:
          organism.species.removeOrganism(organism)
@@ -283,6 +298,6 @@ class Population:
             found = True
             break;
 
-      if not found:
+      if debug and not found:
          print "ERROR: Best species died!"
 
