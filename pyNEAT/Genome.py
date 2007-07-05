@@ -41,24 +41,20 @@ class Genome:
       genome = Genome(id)
 
       genome.neurons = []
+      neuronMap = {}
       if self.neurons is not None:
          for neuron in self.neurons:
             copy = Neuron(neuron.id, neuron.type, active=neuron.active, trait=neuron.trait)
             genome.neurons.append(copy)
+            neuronMap[copy.id] = copy
 
+      # XXX: not using traits
       genome.genes = []
       if self.genes is not None:
          for gene in self.genes:
-            input  = None
-            output = None
-            for neuron in genome.neurons:
-               if neuron.id == gene.input.id:
-                  input = neuron
-               if neuron.id == gene.output.id:
-                  output = neuron
-               if input is not None and output is not None:
-                  break
-            if input is not None and output is not None:
+            if gene.input.id in neuronMap and gene.output.id in neuronMap:
+               input  = neuronMap[gene.input.id]
+               output = neuronMap[gene.output.id]
                genome.genes.append(Gene(input, output, gene.synapse.weight, gene.synapse.recurrent, gene.synapse.trait, gene.enabled, gene.mutation, gene.innovation))
 
       # XXX: copying reference
@@ -67,6 +63,9 @@ class Genome:
       return genome
 
    def load(self, file):
+      traitMap  = {}
+      neuronMap = {}
+
       for line in file.readlines():
          if not line.startswith('/*'):
             pieces = line.split()
@@ -78,22 +77,22 @@ class Genome:
                   print "ERROR: id mismatch in genome specification"
                   break
             elif type == 'trait':
-               self.traits.append(Trait(config=pieces))
+               trait = Trait(config=pieces)
+               self.traits.append(trait)
+               traitMap[trait.id] = trait
             elif type == 'node':
                id      = int(pieces[0])
                traitId = int(pieces[1])
                type    = int(pieces[2]) # wtf?
                type    = int(pieces[3])
 
-               found = False
-               for trait in self.traits:
-                  if trait.id == traitId:
-                     found = True
-                     self.neurons.append(Neuron(id, type, trait=trait))
-                     break
+               if traitId in traitMap:
+                  neuron = Neuron(id, type, trait=traitMap[traitId])
+               else:
+                  neuron = Neuron(id, type)
 
-               if not found:
-                  self.neurons.append(Neuron(id, type))
+               self.neurons.append(neuron)
+               neuronMap[id] = neuron
             elif type == 'gene':
                traitId    = int(pieces[0])
                inputId    = int(pieces[1])
@@ -118,18 +117,14 @@ class Genome:
                input  = None
                output = None
 
-               for t in self.traits:
-                  if t.id == traitId:
-                     trait = t
-                     break
+               if traitId in traitMap:
+                  trait = traitMap[traitId]
 
-               for neuron in self.neurons:
-                  if neuron.id == inputId:
-                     input = neuron
-                  elif neuron.id == outputId:
-                     output = neuron
-                  if input is not None and output is not None:
-                     break
+               if inputId in neuronMap:
+                  input = neuronMap[inputId]
+
+               if outputId in neuronMap:
+                  output = neuronMap[outputId]
 
                if trait is not None and input is not None and output is not None:
                   self.genes.append(Gene(input, output, weight, recurrent, trait, enabled, mutation, innovation))

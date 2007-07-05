@@ -11,6 +11,7 @@ class NeuralNetwork:
       self.outputs    = outputs
       self.allNeurons = all
       self.genotype   = None
+      self.depth      = -1
 
    def activate(self, debug=False):
       for neuron in self.allNeurons:
@@ -40,12 +41,15 @@ class NeuralNetwork:
                print '\t', synapse.input.id, '->', neuron.id
 
    def getMaxDepth(self):
-      maxDepth = 0
-      for output in self.outputs:
-         depth = output.getMaxDepth()
-         if depth > maxDepth:
-            maxDepth = depth
-      return maxDepth
+      if self.depth < 0:
+         self.depth = 0
+         for output in self.outputs:
+            depth = output.getMaxDepth()
+            if depth > self.depth:
+               self.depth = depth
+         return self.depth
+      else:
+         return self.depth
 
    def setInput(self, values):
       valueIndex = 0

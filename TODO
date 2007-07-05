@@ -8,10 +8,15 @@
    - text weight on connection lines
    - open existing network file for display
    - open/load start genes
-   - should be able to monitor/control parallel jobs through Linda
+   - should be able to monitor/control parallel jobs (Linda) through interface
 * use python logging module for console output?
    - possibly get rid of 'if debug' stuff
+* features
+   - hyperneat
+   - Q learning
+   - temporal delay, signal delay
+      - leaky [integrator] neurons
+      - Continuous Time Recurrent Neural Networks (CTRNNs)
 * more examples
 * testing
 * optimize
-   - target reproduction first

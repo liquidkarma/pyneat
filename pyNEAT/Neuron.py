@@ -23,6 +23,12 @@ class Neuron:
       else:
          self.synapses = []
 
+   def __str__(self):
+      return '<%d %f %f>' % (self.id, self.input, self.output)
+
+   def __repr__(self):
+      return '<' + str(self.id) + ' ' + str(self.input) + ' ' + str(self.output) + '>'
+
    def deriveTrait(self, trait):
       self.params = trait.params
 
