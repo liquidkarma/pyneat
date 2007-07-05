@@ -228,12 +228,12 @@ if graphicsAvailable:
          for neuron in network.allNeurons:
             layer = neuron.getMaxDepth()
             # cull disconnected neurons
-            if layer > 0 or (layer == 0 and neuron in network.inputs):
-               for synapse in neuron.synapses:
-                  connections.append((synapse.input.id, synapse.weight, neuron.id))
-               if layer not in neurons:
-                  neurons[layer] = []
-               neurons[layer].append(neuron.id)
+            #if layer > 0 or (layer == 0 and neuron in network.inputs):
+            for synapse in neuron.synapses:
+               connections.append((synapse.input.id, synapse.weight, neuron.id))
+            if layer not in neurons:
+               neurons[layer] = []
+            neurons[layer].append(neuron.id)
 
          numLayers = len(neurons)
 

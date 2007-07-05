@@ -89,15 +89,15 @@ class Population:
       numSpecies   = len(self.species)
       numOrganisms = len(self.organisms)
 
-      # enforce diversification
-      if generation > 1:
-         if numSpecies < Configuration.numSpeciesTarget:
-            Configuration.compatibilityThreshold -= 0.3
-         elif numSpecies > Configuration.numSpeciesTarget:
-            Configuration.compatibilityThreshold += 0.3
+      if Configuration.enforceDiversification:
+         if generation > 1:
+            if numSpecies < Configuration.numSpeciesTarget:
+               Configuration.compatibilityThreshold -= 0.3
+            elif numSpecies > Configuration.numSpeciesTarget:
+               Configuration.compatibilityThreshold += 0.3
 
-         if Configuration.compatibilityThreshold < 0.3:
-            Configuration.compatibilityThreshold = 0.3
+            if Configuration.compatibilityThreshold < 0.3:
+               Configuration.compatibilityThreshold = 0.3
 
       for specie in self.species:
          specie.calcFitnessStats()

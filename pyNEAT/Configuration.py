@@ -65,6 +65,8 @@ class Configuration:
    sigmoidSlope     = 4.924273
    sigmoidConstant  = 2.4621365
 
+   enforceDiversification = 0
+
 def printConfiguration():
    members = inspect.getmembers(Configuration)
    for member in members:
