@@ -34,6 +34,7 @@ class Species:
 
    def addOrganism(self, organism):
       self.organisms.append(organism)
+      organism.species = self
 
    def removeOrganism(self, organism):
       if organism in self.organisms:

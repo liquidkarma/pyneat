@@ -57,32 +57,26 @@ class Population:
       counter      = 0
 
       for organism in self.organisms:
-         if self.species is None:
-            counter += 1
-            newSpecies = Species(counter)
-            newSpecies.addOrganism(organism)
-            organism.species = newSpecies
-            self.species = [newSpecies]
-         else:
-            foundSpecies = False
+         addSpecies = True
 
+         if self.species is None:
+            self.species = []
+         else:
             for specie in self.species:
                for compareOrganism in specie.organisms:
                   if organism.isCompatibleWith(compareOrganism):
                      specie.addOrganism(organism)
-                     organism.species = specie
-                     foundSpecies = True
+                     addSpecies = False
                      break
 
-               if foundSpecies:
+               if not addSpecies:
                   break
 
-            if not foundSpecies:
-               counter += 1
-               newSpecies = Species(counter)
-               newSpecies.addOrganism(organism)
-               organism.species = newSpecies
-               self.species.append(newSpecies)
+         if addSpecies:
+            counter += 1
+            newSpecies = Species(counter)
+            newSpecies.addOrganism(organism)
+            self.species.append(newSpecies)
 
    def epoch(self, generation, experiment, debug=True):
       for organism in self.organisms:
@@ -96,14 +90,14 @@ class Population:
       numOrganisms = len(self.organisms)
 
       # enforce diversification
-      #if generation > 1:
-      #   if numSpecies < Configuration.numSpeciesTarget:
-      #      Configuration.compatibilityThreshold -= 0.3
-      #   elif numSpecies > Configuration.numSpeciesTarget:
-      #      Configuration.compatibilityThreshold += 0.3
-      #
-      #   if Configuration.compatibilityThreshold < 0.3:
-      #      Configuration.compatibilityThreshold = 0.3
+      if generation > 1:
+         if numSpecies < Configuration.numSpeciesTarget:
+            Configuration.compatibilityThreshold -= 0.3
+         elif numSpecies > Configuration.numSpeciesTarget:
+            Configuration.compatibilityThreshold += 0.3
+
+         if Configuration.compatibilityThreshold < 0.3:
+            Configuration.compatibilityThreshold = 0.3
 
       for specie in self.species:
          specie.calcFitnessStats()

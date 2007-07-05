@@ -232,8 +232,8 @@ class Genome:
                j += 1
                numDisjoint += 1
 
-      return Configuration.disjointCoefficient           * (numDisjoint / 1.0) + \
-             Configuration.excessCoefficient             * (numExcess   / 1.0) + \
+      return Configuration.disjointCoefficient           * numDisjoint + \
+             Configuration.excessCoefficient             * numExcess   + \
              Configuration.mutationDifferenceCoefficient * (totalMutationDifference / numMatching)
 
    def isCompatibleWith(self, genome):

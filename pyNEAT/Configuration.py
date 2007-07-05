@@ -23,7 +23,7 @@ class Configuration:
    # same function, respectively.
    disjointCoefficient           = 1.0
    excessCoefficient             = 1.0
-   mutationDifferenceCoefficient = 3.0
+   mutationDifferenceCoefficient = 0.4
 
    # This global tells compatibility threshold under which
    # two Genomes are considered the same species
