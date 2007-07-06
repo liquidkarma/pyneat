@@ -89,9 +89,15 @@ def getConfigurationPairs():
          members[key] = getattr(Configuration, key)
    return members
 
-def printConfiguration():
-   for name, value in getConfigurationPairs().iteritems():
-      print name, '=', value
+def printConfiguration(fileName=None):
+   if fileName is None:
+      for name, value in getConfigurationPairs().iteritems():
+         print name, '=', value
+   else:
+      f = open(fileName, 'w')
+      for name, value in getConfigurationPairs().iteritems():
+         f.write(name + ' = ' + str(value) + '\n')
+      f.close()
 
 def setConfiguration(config):
    fields = []

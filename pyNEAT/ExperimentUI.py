@@ -211,10 +211,14 @@ if graphicsAvailable:
          fileMenu = Tkinter.Menu(menu)
          menu.add_cascade(label='File', menu=fileMenu)
 
-         fileMenu.add_command(label='Options...', command=self.doOptions)
-         #fileMenu.add_command(label='Open...', command=self.openNetwork)
+         fileMenu.add_command(label='Set start genes file...', command=self.doStartGenes)
+         fileMenu.add_separator()
+         fileMenu.add_command(label='Options...'             , command=self.doOptions)
+         fileMenu.add_command(label='Save Options...'        , command=self.doSaveOptions)
          #fileMenu.add_separator()
-         fileMenu.add_command(label='Exit', command=self.doQuit)
+         #fileMenu.add_command(label='Open Network...'        , command=self.openNetwork)
+         fileMenu.add_separator()
+         fileMenu.add_command(label='Exit'                   , command=self.doQuit)
 
          helpMenu = Tkinter.Menu(menu)
          menu.add_cascade(label='Help', menu=helpMenu)
@@ -251,8 +255,20 @@ if graphicsAvailable:
          self.status = StatusBar(self.root)
          self.status.pack(side=Tkinter.BOTTOM, fill=Tkinter.X)
 
+      def doStartGenes(self):
+         file = tkFileDialog.askopenfilename(initialfile=self.experiment.startGenesFileName)
+         if file:
+            print 'setting start genes to file:', file
+            self.experiment.startGenesFileName = file
+
       def doOptions(self):
          ConfigDialog(self.root)
+
+      def doSaveOptions(self):
+         file = tkFileDialog.asksaveasfilename()
+         if file:
+            print 'saving configuration as', file
+            printConfiguration(file)
 
       def openNetwork(self):
          file = tkFileDialog.askopenfilename()

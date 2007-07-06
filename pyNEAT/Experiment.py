@@ -37,12 +37,6 @@ class Experiment:
       self.runs               = runs
       self.ui                 = ui(self)
 
-      if self.generations is None:
-         self.generations = Configuration.numGenerations
-
-      if self.runs is None:
-         self.runs = Configuration.numRuns
-
    def run(self, useGUI=False):
       if not useGUI:
          self.oldUI = self.ui
@@ -56,9 +50,18 @@ class Experiment:
    def getRuns(self):
       startGenome = Genome(fileName=self.startGenesFileName)
 
-      for i in range(self.runs):
+      generations = self.generations
+      runs        = self.runs
+
+      if generations is None:
+         generations = Configuration.numGenerations
+
+      if runs is None:
+         runs = Configuration.numRuns
+
+      for i in range(runs):
          self.population = Population(startGenome)
-         for generation in range(self.generations):
+         for generation in range(generations):
             run = Run(i, generation)
 
             startTime = time.clock()
