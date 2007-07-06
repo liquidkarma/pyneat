@@ -11,11 +11,14 @@ class Run:
       self.generation = generation
 
 class Experiment:
-   def __init__(self, name, start_genes_filename=None, generations=Configuration.numGenerations, ui=ExperimentUI):
+   def __init__(self, name, start_genes_filename=None, generations=None, ui=ExperimentUI):
       self.name               = name
       self.startGenesFileName = start_genes_filename
       self.generations        = generations
       self.ui                 = ui(self)
+
+      if self.generations is None:
+         self.generations = Configuration.numGenerations
 
    def run(self, useGUI=False):
       if not useGUI:

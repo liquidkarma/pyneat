@@ -53,7 +53,7 @@ class Configuration:
    populationSize   = 1000 # Size of population
    dropoffAge       =   15 # Age where Species starts to be penalized
    synapseAddTries  =   20 # Number of tries mutate_add_link will attempt to find an open link
-   print_every      =    0 # Tells to print population to file every n generations
+   printEvery       =    0 # Tells to print population to file every n generations
 
    babiesStolen     =    0 # The number of babies to siphen off to the champions
 

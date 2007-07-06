@@ -311,6 +311,7 @@ if graphicsAvailable:
 
       def endTest(self, name):
          self.status.setRunning(False)
+         self.running = False
          self.runButton.config(text='Run', state=Tkinter.ACTIVE)
 
       def run(self):
