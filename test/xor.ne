@@ -1,4 +1,4 @@
-populationSize         = 100
+#populationSize         = 100
 #numSpeciesTarget       = 1000
 #enforceDiversification = 1
-numGenerations         = 10
+#numGenerations         = 10
