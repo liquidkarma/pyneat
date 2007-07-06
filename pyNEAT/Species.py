@@ -1,3 +1,22 @@
+"""
+pyNEAT
+Copyright (C) 2007 Brian Greer
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+"""
+
 import math
 import random
 
@@ -113,7 +132,7 @@ class Species:
                      newGenome.mutateSynapseWeights(Mutator.GAUSSIAN, mutationPower, 1.0)
                   else:
                      netAnalogue = newGenome.genesis(generation)
-                     newGenome.mutateAddSynapse(population.currentInnovation, population.innovations, Configuration.synapseAddTries)
+                     newGenome.mutateAddSynapse(population, Configuration.synapseAddTries)
                      mutateBabyStructure = True
 
                baby = Organism(0.0, newGenome, generation)
@@ -137,11 +156,11 @@ class Species:
                newGenome    = mom.genome.makeCopy(i)
 
                if randfloat() < Configuration.mutateAddNeuronProbability:
-                  newGenome.mutateAddNeuron(population.currentNeuronId, population.currentInnovation, population.innovations)
+                  newGenome.mutateAddNeuron(population)
                   mutateBabyStructure = True
                elif randfloat() < Configuration.mutateAddSynapseProbability:
                   netAnalogue = newGenome.genesis(generation)
-                  newGenome.mutateAddSynapse(population.currentInnovation, population.innovations, Configuration.synapseAddTries)
+                  newGenome.mutateAddSynapse(population, Configuration.synapseAddTries)
                   mutateBabyStructure = True
                else:
                   newGenome.tryAllMutations(mutationPower)
@@ -185,11 +204,11 @@ class Species:
 
                if randfloat() > Configuration.mateOnlyProbability or dad.genome.id == mom.genome.id or dad.genome.getCompatibility(mom.genome) == 0.0:
                   if randfloat() < Configuration.mutateAddNeuronProbability:
-                     newGenome.mutateAddNeuron(population.currentNeuronId, population.currentInnovation, population.innovations)
+                     newGenome.mutateAddNeuron(population)
                      mutateBabyStructure = True
                   elif randfloat() < Configuration.mutateAddSynapseProbability:
                      netAnalogue = newGenome.genesis(generation)
-                     newGenome.mutateAddSynapse(population.currentInnovation, population.innovations, Configuration.synapseAddTries)
+                     newGenome.mutateAddSynapse(population, Configuration.synapseAddTries)
                      mutateBabyStructure = True
                   else:
                      newGenome.tryAllMutations(mutationPower)

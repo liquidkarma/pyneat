@@ -1,5 +1,24 @@
 #!/usr/bin/python
 
+"""
+pyNEAT
+Copyright (C) 2007 Brian Greer
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+"""
+
 ## Simple XOR experiment. This should be the minimum amount of effort required
 ## to create an experiment with pyNEAT.
 
@@ -21,7 +40,7 @@ class XORTest(pyNEAT.Experiment):
       for input in self.inputs:
          network.setInput(input)
          network.activate()
-         for i in range(networkDepth):
+         for j in range(networkDepth):
             network.activate()
          outputs.append(network.outputs[0].output)
          network.clear()
@@ -41,6 +60,7 @@ class XORTest(pyNEAT.Experiment):
       return fitness, outputs, error, winner
 
 if __name__ == '__main__':
+   pyNEAT.loadConfiguration('xor.ne')
    xorTest = XORTest()
    xorTest.run(useGUI=True)
    #profile.run("xorTest.run()")

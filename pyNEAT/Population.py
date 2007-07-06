@@ -1,3 +1,22 @@
+"""
+pyNEAT
+Copyright (C) 2007 Brian Greer
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+"""
+
 import random
 import math
 import time
@@ -13,12 +32,12 @@ class Population:
       if size < 0:
          size = Configuration.populationSize
 
-      self.winnerGeneration   = 0
-      self.highestFitness     = 0.0
-      self.highestLastChanged = 0
+      self.winnerGeneration     = 0
+      self.highestFitness       = 0.0
+      self.highestLastChanged   = 0
 
-      self.currentNeuronId    = 0
-      self.currentInnovation  = 0
+      self.currentNeuronId      = 0
+      self.currentInnovationId  = 0
 
       self.champion = None
 
@@ -27,10 +46,9 @@ class Population:
       self.innovations = []
 
       if genome is None:
-         self.currentNeuronId     = numInputs + numOutputs + maxHidden
-         self.currentInnovationId = self.currentNeuronId * self.currentNeuronId + 1
-
-         self.currentNeuronId += 1
+         numNodes                 = numInputs + numOutputs + maxHidden
+         self.currentNeuronId     = numNodes + 1
+         self.currentInnovationId = numNodes * numNodes + 1
 
          for i in range(size):
             self.organisms.append(Genome(i, numInputs, numOutputs, random.randint(0, maxHidden), maxHidden, recurrent, linkProbability))
@@ -295,3 +313,12 @@ class Population:
       if debug and not found:
          print "ERROR: Best species died!"
 
+   def getNextInnovationId(self, inc=1):
+      id = self.currentInnovationId
+      self.currentInnovationId += inc
+      return id
+
+   def getNextNeuronId(self):
+      id = self.currentNeuronId
+      self.currentNeuronId += 1
+      return id

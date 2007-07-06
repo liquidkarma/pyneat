@@ -1,3 +1,22 @@
+"""
+pyNEAT
+Copyright (C) 2007 Brian Greer
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+"""
+
 import math
 import random
 
@@ -348,7 +367,7 @@ class Genome:
             gene.enabled = True
             break
 
-   def mutateAddNeuron(self, id, currentInnovation, innovations):
+   def mutateAddNeuron(self, population):
       splitGene = None
 
       if len(self.genes) < 15:
@@ -382,7 +401,7 @@ class Genome:
          newNeuron = None
 
          found = False
-         for innovation in innovations:
+         for innovation in population.innovations:
             if innovation.type == Innovation.NEURON and \
                innovation.inId == input.id and \
                innovation.outId == output.id and \
@@ -392,33 +411,33 @@ class Genome:
                if len(self.traits) > 0:
                   newNeuron.trait = self.traits[0]
 
-               newGene1 = Gene(input, newNeuron, 1.0, synapse.recurrent, synapse.trait, innovation=innovation.idA, mutation=0)
-               newGene2 = Gene(newNeuron, output, oldWeight, False, synapse.trait, innovation=innovation.idB, mutation=0)
+               newGene1 = Gene(input, newNeuron, 1.0, synapse.recurrent, synapse.trait, innovation=innovation.idA)
+               newGene2 = Gene(newNeuron, output, oldWeight, False, synapse.trait, innovation=innovation.idB)
 
                found = True
                break
 
 
          if not found:
+            id = population.getNextNeuronId()
             newNeuron = Neuron(id)
-            id += 1
 
             if len(self.traits) > 0:
                newNeuron.trait = self.traits[0]
 
-            newGene1 = Gene(input, newNeuron, 1.0, synapse.recurrent, synapse.trait, innovation=currentInnovation, mutation=0)
-            newGene2 = Gene(newNeuron, output, oldWeight, False, synapse.trait, innovation=currentInnovation + 1, mutation=0)
+            innovationId = population.getNextInnovationId(2)
 
-            innovations.append(Innovation(input.id, output.id, idA=currentInnovation, idB=currentInnovation + 1.0, oldId=splitGene.innovation, type=Innovation.NEURON, newNeuronId=newNeuron.id))
+            newGene1 = Gene(input, newNeuron, 1.0, synapse.recurrent, synapse.trait, innovation=innovationId)
+            newGene2 = Gene(newNeuron, output, oldWeight, False, synapse.trait, innovation=innovationId + 1)
 
-            currentInnovation += 2.0
+            population.innovations.append(Innovation(input.id, output.id, idA=innovationId, idB=innovationId + 1, oldId=splitGene.innovation, type=Innovation.NEURON, newNeuronId=newNeuron.id))
 
          if newNeuron is not None:
             self.genes.append(newGene1)
             self.genes.append(newGene2)
             self.neurons.append(newNeuron)
 
-   def mutateAddSynapse(self, currentInnovation, innovations, tries):
+   def mutateAddSynapse(self, population, tries):
       recurrent = False
       if randfloat() < Configuration.recurrentProbability:
          recurrent = True
@@ -490,17 +509,21 @@ class Genome:
 
          newGene = None
 
-         for innovation in innovations:
-            if innovation.type == Innovation.SYNAPSE and innovation.inId == input.id and innovation.outId == output.id and innovation.recurrent == recurrent:
+         for innovation in population.innovations:
+            if innovation.type == Innovation.SYNAPSE and \
+               innovation.inId == input.id and \
+               innovation.outId == output.id and \
+               innovation.recurrent == recurrent:
                newGene = Gene(input, output, innovation.weight, recurrent, self.traits[innovation.traitId], innovation=innovation.idA)
                found = True
                break
 
          if not found:
-            traitIndex = random.randint(0, len(self.traits) - 1)
-            newWeight  = randposneg() * randfloat() * 10.0
-            newGene    = Gene(input, output, newWeight, recurrent, innovation=currentInnovation, mutation=newWeight)
-            innovations.append(Innovation(inId=input.id, outId=output.id, weight=newWeight, idA=currentInnovation, traitId=traitIndex, type=Innovation.SYNAPSE, recurrent=recurrent))
+            innovationId = population.getNextInnovationId()
+            traitIndex   = random.randint(0, len(self.traits) - 1)
+            newWeight    = randposneg() * randfloat() * 10.0
+            newGene      = Gene(input, output, newWeight, recurrent, innovation=innovationId, mutation=newWeight)
+            population.innovations.append(Innovation(inId=input.id, outId=output.id, weight=newWeight, idA=innovationId, traitId=traitIndex, type=Innovation.SYNAPSE, recurrent=recurrent))
 
          self.genes.append(newGene)
 
