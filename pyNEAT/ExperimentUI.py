@@ -156,7 +156,8 @@ if graphicsAvailable:
          self.config = {}
 
          r = 0
-         for name, value in getConfigurationPairs().iteritems():
+         members = sorted(getConfigurationPairs().iteritems(), lambda x, y: cmp(x[0], y[0]))
+         for name, value in members:
             Tkinter.Label(self.frame, text=name).grid(row=r, sticky=Tkinter.W)
             entry = Tkinter.Entry(self.frame)
             entry.insert(0, str(value))

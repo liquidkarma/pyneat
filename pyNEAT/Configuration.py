@@ -25,12 +25,6 @@ class Configuration:
    traitParamMutationProbability = 0.5 # Prob. of mutating a single trait param
    traitMutationPower            = 1.0 # Power of mutation on a signle trait param
 
-   # Amount that mutation_num changes for a trait change inside a link
-   linktrait_mut_sig = 1.0
-
-   # Amount a mutation_num changes on a link connecting a node that changed its trait
-   nodetrait_mut_sig = 0.5
-
    weightMutationPower = 1.8 # The power of a linkweight mutation
 
    # These 3 global coefficients are used to determine the formula for
@@ -54,7 +48,9 @@ class Configuration:
    mutateOnlyProbability           = 0.25 # Prob. of a non-mating reproduction
    mutateRandomTraitProbability    = 0.1
    mutateSynapseTraitProbability   = 0.1
+   mutateSynapseTraitSignificance  = 1.0  # Amount that mutation_num changes for a trait change inside a link
    mutateNeuronTraitProbability    = 0.1
+   mutateNeuronTraitSignificance   = 0.5  # Amount a mutation_num changes on a link connecting a node that changed its trait
    mutateSynapseWeightsProbability = 0.8
    mutateToggleEnableProbability   = 0.1
    mutateGeneReenableProbability   = 0.05

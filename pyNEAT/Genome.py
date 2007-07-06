@@ -290,6 +290,9 @@ class Genome:
 
             self.genes[geneIndex].synapse.trait = self.traits[traitIndex]
 
+            # future use code from neat-c
+            #self.genes[geneIndex].mutation += randposneg() * randfloat() * Configuration.mutateSynapseTraitSignificance
+
    def mutateNeuronTrait(self, times):
       if len(self.traits) > 0 and len(self.neurons) > 0:
          for i in range(times):
@@ -297,6 +300,12 @@ class Genome:
             neuronIndex = random.randint(0, len(self.neurons) - 1)
 
             self.neurons[neuronIndex].trait = self.traits[traitIndex]
+
+            # future use code from neat-c
+            #for gene in self.genes:
+            #   if gene.synapse.input == self.neurons[neuronIndex] or \
+            #      gene.synapse.output == self.neurons[neuronIndex]:
+            #      gene.mutation += randposneg() * randfloat() * Configuration.mutateNeuronTraitSignificance
 
    def mutateSynapseWeights(self, type, power, rate):
       severe = False
