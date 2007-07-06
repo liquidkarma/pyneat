@@ -30,14 +30,18 @@ class Run:
       self.generation = generation
 
 class Experiment:
-   def __init__(self, name, start_genes_filename=None, generations=None, ui=ExperimentUI):
+   def __init__(self, name, start_genes_filename=None, generations=None, runs=None, ui=ExperimentUI):
       self.name               = name
       self.startGenesFileName = start_genes_filename
       self.generations        = generations
+      self.runs               = runs
       self.ui                 = ui(self)
 
       if self.generations is None:
          self.generations = Configuration.numGenerations
+
+      if self.runs is None:
+         self.runs = Configuration.numRuns
 
    def run(self, useGUI=False):
       if not useGUI:
@@ -52,7 +56,7 @@ class Experiment:
    def getRuns(self):
       startGenome = Genome(fileName=self.startGenesFileName)
 
-      for i in range(Configuration.numRuns):
+      for i in range(self.runs):
          self.population = Population(startGenome)
          for generation in range(self.generations):
             run = Run(i, generation)

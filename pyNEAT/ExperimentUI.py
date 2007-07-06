@@ -26,6 +26,8 @@ try:
 except:
    graphicsAvailable = False
 
+from Configuration import *
+
 class ExperimentUIBase:
    def run(self):
       self.running = True
@@ -132,6 +134,60 @@ if graphicsAvailable:
          else:
             self._setLabel(self.winner, 'Winner: None')
 
+   class ConfigDialog(tkSimpleDialog.Dialog):
+      def body(self, master):
+         self.title('Configuration Options')
+
+         self.scroll = Tkinter.Scrollbar(master, orient=Tkinter.VERTICAL)
+         self.scroll.grid(row=0, column=1, sticky=Tkinter.N+Tkinter.S)
+
+         self.canvas = Tkinter.Canvas(master, yscrollcommand=self.scroll.set)
+         self.canvas.grid(row=0, column=0, sticky=Tkinter.N+Tkinter.S+Tkinter.E+Tkinter.W)
+
+         self.scroll.config(command=self.canvas.yview)
+
+         master.grid_rowconfigure(0, weight=1)
+         master.grid_columnconfigure(0, weight=1)
+
+         self.frame = Tkinter.Frame(self.canvas)
+         self.frame.rowconfigure(1, weight=1)
+         self.frame.columnconfigure(1, weight=1)
+
+         self.config = {}
+
+         r = 0
+         for name, value in getConfigurationPairs().iteritems():
+            Tkinter.Label(self.frame, text=name).grid(row=r, sticky=Tkinter.W)
+            entry = Tkinter.Entry(self.frame)
+            entry.insert(0, str(value))
+            entry.grid(row=r, column=1)
+            r += 1
+            self.config[name] = entry
+
+         self.canvas.create_window(0, 0, anchor=Tkinter.NW, window=self.frame)
+
+         self.frame.update_idletasks()
+
+         self.canvas.config(scrollregion=self.canvas.bbox('all'))
+
+         return None
+
+      def validate(self):
+         try:
+            for value in self.config.values():
+               ival = float(value.get()) # generic test of validity
+            return 1
+         except ValueError:
+            tkMessageBox.showerror('Bad Input', 'Illegal values, please try again')
+            return 0
+
+      def apply(self):
+         config = {}
+         for key, entry in self.config.iteritems():
+            config[key] = entry.get()
+
+         setConfiguration(config)
+
    class ExperimentGUI(ExperimentUIBase):
       def __init__(self, experiment):
          self.experiment = experiment
@@ -154,6 +210,7 @@ if graphicsAvailable:
          fileMenu = Tkinter.Menu(menu)
          menu.add_cascade(label='File', menu=fileMenu)
 
+         fileMenu.add_command(label='Options...', command=self.doOptions)
          #fileMenu.add_command(label='Open...', command=self.openNetwork)
          #fileMenu.add_separator()
          fileMenu.add_command(label='Exit', command=self.doQuit)
@@ -192,6 +249,9 @@ if graphicsAvailable:
       def _addStatusBar(self):
          self.status = StatusBar(self.root)
          self.status.pack(side=Tkinter.BOTTOM, fill=Tkinter.X)
+
+      def doOptions(self):
+         ConfigDialog(self.root)
 
       def openNetwork(self):
          file = tkFileDialog.askopenfilename()

@@ -120,9 +120,6 @@ class Species:
          for i in range(int(self.expectedOffspring)):
             baby = None
 
-            mutateBabyStructure = False
-            mateBaby            = False
-
             if champion.superChampionOffspring > 0:
                mom       = champion
                newGenome = mom.genome.makeCopy(i)
@@ -131,9 +128,8 @@ class Species:
                   if randfloat() < 0.8 or Configuration.mutateAddSynapseProbability == 0.0:
                      newGenome.mutateSynapseWeights(Mutator.GAUSSIAN, mutationPower, 1.0)
                   else:
-                     netAnalogue = newGenome.genesis(generation)
+                     newGenome.genesis(generation)
                      newGenome.mutateAddSynapse(population, Configuration.synapseAddTries)
-                     mutateBabyStructure = True
 
                baby = Organism(0.0, newGenome, generation)
 
@@ -157,11 +153,9 @@ class Species:
 
                if randfloat() < Configuration.mutateAddNeuronProbability:
                   newGenome.mutateAddNeuron(population)
-                  mutateBabyStructure = True
                elif randfloat() < Configuration.mutateAddSynapseProbability:
-                  netAnalogue = newGenome.genesis(generation)
+                  newGenome.genesis(generation)
                   newGenome.mutateAddSynapse(population, Configuration.synapseAddTries)
-                  mutateBabyStructure = True
                else:
                   newGenome.tryAllMutations(mutationPower)
 
@@ -200,23 +194,18 @@ class Species:
                else:
                   newGenome = mom.genome.crossover(Crossover.SINGLEPOINT, dad.genome, i)
 
-               mateBaby = True
-
-               if randfloat() > Configuration.mateOnlyProbability or dad.genome.id == mom.genome.id or dad.genome.getCompatibility(mom.genome) == 0.0:
+               if randfloat() > Configuration.mateOnlyProbability or \
+                  dad.genome.id == mom.genome.id or \
+                  dad.genome.getCompatibility(mom.genome) == 0.0:
                   if randfloat() < Configuration.mutateAddNeuronProbability:
                      newGenome.mutateAddNeuron(population)
-                     mutateBabyStructure = True
                   elif randfloat() < Configuration.mutateAddSynapseProbability:
-                     netAnalogue = newGenome.genesis(generation)
+                     newGenome.genesis(generation)
                      newGenome.mutateAddSynapse(population, Configuration.synapseAddTries)
-                     mutateBabyStructure = True
                   else:
                      newGenome.tryAllMutations(mutationPower)
 
                baby = Organism(0.0, newGenome, generation)
-
-            baby.mutateBabyStructure = mutateBabyStructure
-            baby.mateBaby            = mateBaby
 
             found = False
 

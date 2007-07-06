@@ -86,28 +86,40 @@ class Configuration:
 
    enforceDiversification = 0
 
+def getConfigurationPairs():
+   members = {}
+   for key in dir(Configuration):
+      if not key.startswith('__'):
+         members[key] = getattr(Configuration, key)
+   return members
+
 def printConfiguration():
-   members = inspect.getmembers(Configuration)
-   for member in members:
-      if not member[0].startswith('__'):
-         print member[0], '=', member[1]
+   for name, value in getConfigurationPairs().iteritems():
+      print name, '=', value
+
+def setConfiguration(config):
+   fields = []
+   for name, value in getConfigurationPairs().iteritems():
+      fields.append(name)
+
+   for key, value in config.iteritems():
+      if key in fields:
+         type = 'int('
+         if value.find('.') >= 0:
+            type = 'float('
+         exec('Configuration.' + key + ' = ' + type + 'value)')
 
 def loadConfiguration(fileName):
-   fields = []
-   members = inspect.getmembers(Configuration)
-   for member in members:
-      if not member[0].startswith('__'):
-         fields.append(member[0])
+   config = {}
 
    file = open(fileName)
    for line in file:
       line = line.strip().replace(' ', '')
       if not line.startswith('#'):
          key, value = line.split('=')
-         if key in fields:
-            type = 'int('
-            if value.find('.') >= 0:
-               type = 'float('
-            exec('Configuration.' + key + ' = ' + type + 'value)')
+         config[key] = value
 
    file.close()
+
+   if len(config) > 0:
+      setConfiguration(config)

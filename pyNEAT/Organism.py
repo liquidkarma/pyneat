@@ -42,3 +42,7 @@ class Organism:
 
    def isCompatibleWith(self, organism):
       return self.genome.isCompatibleWith(organism.genome)
+
+   def setId(self, id):
+      self.genome.id  = id
+      self.network.id = id

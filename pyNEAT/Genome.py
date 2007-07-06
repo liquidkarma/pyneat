@@ -542,24 +542,21 @@ class Genome:
 
    def addNeuron(self, referenceNeuron, neuronPool, traitPool):
       newNeuron = None
-      found     = False
 
       for neuron in neuronPool:
          if neuron.id == referenceNeuron.id:
             newNeuron = neuron
-            found     = True
             break
 
-      if not found:
+      if newNeuron is None:
          if referenceNeuron.trait is None:
             newTraitId = 0
          else:
             newTraitId = referenceNeuron.trait.id - self.traits[0].id
 
-         newNeuron       = Neuron(referenceNeuron.id, referenceNeuron.type, \
-                                  referenceNeuron.synapses, referenceNeuron.output, \
-                                  referenceNeuron.active)
-         newNeuron.trait = traitPool[newTraitId]
+         newNeuron = Neuron(referenceNeuron.id, referenceNeuron.type, \
+                            referenceNeuron.synapses, referenceNeuron.output, \
+                            referenceNeuron.active, traitPool[newTraitId])
 
          self.insertNeuron(neuronPool, newNeuron)
 
@@ -763,11 +760,10 @@ class Genome:
                newOutput = self.addNeuron(output, babyNeurons, babyTraits)
                newInput  = self.addNeuron(input , babyNeurons, babyTraits)
 
-            newGene = Gene(chosenGene.input, chosenGene.output, enabled=chosenGene.enabled, \
+            newGene = Gene(newInput, newOutput, chosenGene.synapse.weight, \
+                           chosenGene.synapse.recurrent, babyTraits[traitId], \
+                           enabled=chosenGene.enabled, \
                            mutation=chosenGene.mutation, innovation=chosenGene.innovation)
-            newGene.synapse = Synapse(newInput, newOutput, \
-                                      chosenGene.synapse.weight, chosenGene.synapse.recurrent, \
-                                      babyTraits[traitId])
 
             if disabled:
                newGene.enabled = False

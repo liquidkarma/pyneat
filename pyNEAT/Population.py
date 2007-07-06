@@ -181,6 +181,7 @@ class Population:
       # check for population stagnation
       self.champion = sortedSpecies[0].organisms[0]
       self.champion.populationChampion = True
+
       if self.champion.originalFitness > self.highestFitness:
          self.highestFitness = self.champion.originalFitness
          self.highestLastChanged = 0
@@ -297,7 +298,7 @@ class Population:
             specie.age += 1
 
          for organism in specie.organisms:
-            organism.genome.id = organismCount
+            organism.setId(organismCount)
             organismCount += 1
             self.organisms.append(organism)
 
