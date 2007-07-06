@@ -70,9 +70,9 @@ class NeuralNetwork:
       for i in range(len(targets)):
          outputDelta[self.outputs[i].id] = (targets[i] - self.outputs[i].output) * Activation.dactivate(self.outputs[i].output, Configuration.sigmoidSlope, Configuration.sigmoidConstant)
 
-      self.__propagate(self.outputs, outputDelta, learningRate)
+      self.__propagate(self.outputs, outputDelta, learningRate, [])
 
-   def __propagate(self, neurons, deltas, learningRate):
+   def __propagate(self, neurons, deltas, learningRate, seenNeurons):
       errors      = {}
       nextDeltas  = {}
       nextNeurons = {}
@@ -80,21 +80,21 @@ class NeuralNetwork:
       for i in range(len(neurons)):
          neuron = neurons[i]
          delta  = deltas[neuron.id]
+         seenNeurons.append(neuron)
          for synapse in neuron.synapses:
-            if synapse.input is not None:
+            if synapse.input is not None and synapse.input not in seenNeurons:
+               nextNeurons[synapse.input.id] = synapse.input
                if synapse.input.id in errors:
                   errors[synapse.input.id] += delta * synapse.weight
                else:
                   errors[synapse.input.id] = delta * synapse.weight
-               if synapse.input.id not in nextNeurons:
-                  nextNeurons[synapse.input.id] = synapse.input
 
 
       for id, error in errors.iteritems():
          nextDeltas[id] = Activation.dactivate(nextNeurons[id].output, Configuration.sigmoidSlope, Configuration.sigmoidConstant) * error
 
       if len(nextNeurons) > 0:
-         self.__propagate(nextNeurons.values(), nextDeltas, learningRate)
+         self.__propagate(nextNeurons.values(), nextDeltas, learningRate, seenNeurons)
 
       for neuron in neurons:
          for synapse in neuron.synapses:

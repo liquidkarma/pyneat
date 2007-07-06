@@ -137,7 +137,7 @@ if graphicsAvailable:
 
          #fileMenu.add_command(label='Open...', command=self.openNetwork)
          #fileMenu.add_separator()
-         fileMenu.add_command(label='Exit', command=self.root.quit)
+         fileMenu.add_command(label='Exit', command=self.doQuit)
 
          helpMenu = Tkinter.Menu(menu)
          menu.add_cascade(label='Help', menu=helpMenu)
@@ -191,6 +191,10 @@ if graphicsAvailable:
          file = tkFileDialog.asksaveasfilename()
          if file:
             print 'saving as', file
+
+      def doQuit(self):
+         self.running = False
+         self.root.quit()
 
       def doRun(self):
          if not self.running:
@@ -285,6 +289,8 @@ if graphicsAvailable:
             else:
                self.canvas.create_line(x0, y0, x1, y1, width=width, stipple=stipple, arrow=Tkinter.LAST)
                usedConnections[(inputId, outputId)] = 1
+
+         self.canvas.update_idletasks()
 
          print 'Network', network.id
          for neuron in network.allNeurons:
