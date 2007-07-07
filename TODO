@@ -4,15 +4,14 @@
 * cull hidden nodes with no out synapses?
    - output signal will never propagate to the output layer
 * gui
-   - recurrant connection drawing
-   - text weight on connection lines
+   - recurrent connection drawing
    - open existing network file for display
-   - open/load start genes
    - should be able to monitor/control parallel jobs (Linda) through interface
 * use python logging module for console output?
    - possibly get rid of 'if debug' stuff
 * features
    - hyperneat
+   - adaptive synapses
    - Q learning
    - temporal delay, signal delay
       - leaky [integrator] neurons

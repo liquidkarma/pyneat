@@ -376,15 +376,22 @@ if graphicsAvailable:
                stipple = 'gray25'
                #width   = 3
 
-            if (inputId, outputId) in usedConnections:
-               count = usedConnections[(inputId, outputId)]
-               usedConnections[(inputId, outputId)] += 1
-               xi = (x0 + x1) / 2 + (width + width) * (-1 ** count);
-               yi = (y0 + y1) / 2 + (width + width) * (-1 ** count);
-               self.canvas.create_line(x0, y0, xi, yi, x1, y1, width=width, stipple=stipple, smooth=True, arrow=Tkinter.LAST)
+            if inputId == outputId:
+               # TODO: handle recurrent connection drawing
+               pass
             else:
-               self.canvas.create_line(x0, y0, x1, y1, width=width, stipple=stipple, arrow=Tkinter.LAST)
-               usedConnections[(inputId, outputId)] = 1
+               if (inputId, outputId) in usedConnections:
+                  count = usedConnections[(inputId, outputId)]
+                  usedConnections[(inputId, outputId)] += 1
+                  xi = (x0 + x1) / 2 + (width + width) * (-1 ** count);
+                  yi = (y0 + y1) / 2 + (width + width) * (-1 ** count);
+                  self.canvas.create_line(x0, y0, xi, yi, x1, y1, width=width, stipple=stipple, smooth=True, arrow=Tkinter.LAST)
+               else:
+                  self.canvas.create_line(x0, y0, x1, y1, width=width, stipple=stipple, arrow=Tkinter.LAST)
+                  usedConnections[(inputId, outputId)] = 1
+
+               if weight > 0:
+                  self.canvas.create_text((x0 + x1) / 2, (y0 + y1) / 2, text='%.4f' % weight, fill='white')
 
          self.canvas.update_idletasks()
 

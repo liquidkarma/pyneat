@@ -101,6 +101,7 @@ class Population:
          fitness, outputs, error, won = experiment.evaluate(organism.network)
 
          organism.fitness = fitness
+         organism.outputs = outputs
          organism.error   = error
          organism.winner  = won
 

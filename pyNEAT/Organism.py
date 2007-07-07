@@ -35,6 +35,7 @@ class Organism:
       self.speciesChampion         = False
 
       self.network                 = genome.genesis(genome.id)
+      self.outputs                 = None
 
    # descending order of fitness
    def __cmp__(self, other):

@@ -74,9 +74,7 @@ class Experiment:
    def epoch(self, generation, run):
       self.population.epoch(generation, self)
 
-      fitness, outputs, error, won = self.evaluate(self.population.champion.network)
-
-      if won:
+      if self.population.champion.winner:
          run.winner = self.population.champion.network.id
       else:
          run.winner = None
@@ -84,7 +82,7 @@ class Experiment:
       run.champion = self.population.champion.network
       run.fitness  = self.population.highestFitness
       run.targets  = self.targets
-      run.outputs  = outputs
+      run.outputs  = self.population.champion.outputs
 
    def evaluate(self, network):
       raise NotImplementedError, 'Please override the \'evaluate\' method in your experiment class'
