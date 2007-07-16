@@ -118,6 +118,7 @@ class Species:
          mutationPower = Configuration.weightMutationPower
 
          for i in range(int(self.expectedOffspring)):
+            mom  = None
             baby = None
 
             if champion.superChampionOffspring > 0:
@@ -207,23 +208,29 @@ class Species:
 
                baby = Organism(0.0, newGenome, generation)
 
-            found = False
+            # try mom's species first, then iterate through all other species
+            # optimization proposed in the NEAT FAQ
+            if baby.isCompatibleWith(mom):
+               mom.species.addOrganism(baby)
+               baby.species = mom.species
+            else:
+               found = False
 
-            for specie in population.species:
-               for organism in specie.organisms:
-                  if baby.isCompatibleWith(organism):
-                     specie.addOrganism(baby)
-                     baby.species = specie
-                     found = True
+               for specie in population.species:
+                  for organism in specie.organisms:
+                     if baby.isCompatibleWith(organism):
+                        specie.addOrganism(baby)
+                        baby.species = specie
+                        found = True
+                        break
+                  if found:
                      break
-               if found:
-                  break
 
-            if not found:
-               newSpecies = Species(len(population.species) + 1, novel=True)
-               newSpecies.addOrganism(baby)
-               baby.species = newSpecies
-               population.species.append(newSpecies)
+               if not found:
+                  newSpecies = Species(len(population.species) + 1, novel=True)
+                  newSpecies.addOrganism(baby)
+                  baby.species = newSpecies
+                  population.species.append(newSpecies)
 
    def countOffspring(self, skim):
       self.expectedOffspring = 0

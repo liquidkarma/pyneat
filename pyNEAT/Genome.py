@@ -567,6 +567,7 @@ class Genome:
                             referenceNeuron.synapses, referenceNeuron.output, \
                             referenceNeuron.active, traitPool[newTraitId])
 
+         # why insert in-order, instead of just appending???
          self.insertNeuron(neuronPool, newNeuron)
 
       return newNeuron
@@ -779,6 +780,10 @@ class Genome:
                disabled = False
 
             babyGenes.append(newGene)
+
+      # TODO: should validate the network here to make sure there is at least
+      # one path from at least one input to at least one output
+      # otherwise mutate the network until this occurs or throw the network away
 
       return Genome(id, babyNeurons, babyGenes, babyTraits)
 
