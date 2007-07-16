@@ -21,14 +21,20 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 ## This is a test case for the backprop algorithm included in pyNEAT
 
-import math
 import pyNEAT
+import sys
+import os.path
+import time
 
 class XORTest:
    def __init__(self):
       self.inputs       = [[1.0, 0.0, 0.0], [1.0, 0.0, 1.0], [1.0, 1.0, 0.0], [1.0, 1.0, 1.0]]
       self.targets      = [0.0, 1.0, 1.0, 0.0]
+      self.outputs      = []
       self.nextNeuronId = 1
+
+      self.name         = 'BP-XOR'
+      self.ui           = pyNEAT.ExperimentUI(self)
 
    def makeNeuron(self, type, pool, all):
       neuron = pyNEAT.Neuron(self.nextNeuronId, type)
@@ -63,20 +69,30 @@ class XORTest:
       return pyNEAT.NeuralNetwork(0, inputs, outputs, all)
 
    def run(self, fitnessThreshold):
-      print "START XOR TEST"
+      self.fitnessThreshold = fitnessThreshold
+      self.ui.run()
 
+   def getRuns(self):
       self.nn = self.makeNetwork()
 
       fitness = self.evaluate(False, False)
 
       count             = 0
-      lastFitness       = 0
+      lastFitness       = 0.0
       lastFitnessChange = 0
 
-      learningRate = 0.3
-      momentum     = 0.1
+      learningRate      = 0.3
+      momentum          = 0.1
 
-      while fitness < fitnessThreshold:
+      generations       = pyNEAT.Configuration.numGenerations
+      runs              = pyNEAT.Configuration.numRuns
+
+      runCount          = 0
+
+      startTime         = time.clock()
+      endTime           = 0
+
+      while fitness < self.fitnessThreshold:
          count += 1
 
          show = False
@@ -86,32 +102,53 @@ class XORTest:
          fitness = self.evaluate(show, True, learningRate)
 
          if (count % 100) == 0:
-            print 'fitness =', fitness
+            runCount += 1
+            run = pyNEAT.Run(runCount, 0)
+
+            endTime  = time.clock()
+            run.time = endTime - startTime
+
+            run.winner   = None
+            run.champion = self.nn
+            run.fitness  = fitness
+            run.targets  = self.targets
+            run.outputs  = self.outputs
+
+            yield run
+
+            startTime = time.clock()
 
          #if (count % 1000) == 0:
          #   learningRate *= momentum
 
-         if lastFitness != 0 and lastFitness == int(fitness):
-            lastFitnessChange += 1
-         else:
-            lastFitness       = int(fitness)
+         #if lastFitness != 0 and lastFitness == int(fitness):
+         #   lastFitnessChange += 1
+         #else:
+         #   lastFitness       = int(fitness)
+         #   lastFitnessChange = 0
+
+         #if fitness > lastFitness:
+         if float('%.3f' % fitness) > float('%.3f' % lastFitness):
+            lastFitness       = fitness
             lastFitnessChange = 0
+         else:
+            lastFitnessChange += 1
 
          if lastFitnessChange > 1000:
             print 'network appears to have stagnated... perturbing network'
+            self.nn.display()
             for synapse in self.synapses:
                synapse.perturb()
+            self.nn.display()
             lastFitnessChange = 0
 
       self.evaluate(True, False)
       self.nn.dump('nn.out')
 
-      print "END XOR TEST"
-
    def evaluate(self, show=False, backprop=True, learningRate=0.3):
       networkDepth = self.nn.getMaxDepth()
 
-      outputs = []
+      self.outputs = []
 
       for i in range(len(self.inputs)):
          self.nn.setInput(self.inputs[i])
@@ -121,7 +158,7 @@ class XORTest:
             self.nn.activate()
 
          output = self.nn.outputs[0].output
-         outputs.append(output)
+         self.outputs.append(output)
 
          if show:
             self.printOutput(self.inputs[i], self.targets[i], output)
@@ -131,9 +168,9 @@ class XORTest:
 
          self.nn.clear()
 
-      sse  = pyNEAT.Fitness.sumSquaredError(outputs, self.targets)
-      rmse = pyNEAT.Fitness.rootMeanSquaredError(outputs, self.targets)
-      me   = pyNEAT.Fitness.meanError(outputs, self.targets)
+      sse  = pyNEAT.Fitness.sumSquaredError(self.outputs, self.targets)
+      rmse = pyNEAT.Fitness.rootMeanSquaredError(self.outputs, self.targets)
+      me   = pyNEAT.Fitness.meanError(self.outputs, self.targets)
 
       fitness = (10.0 - rmse) ** 2
 
@@ -153,15 +190,18 @@ class XORTest:
 
 def trainTest():
    xorTest = XORTest()
-   xorTest.run(99)
+   xorTest.run(99.5)
 
-def loadTest():
+def loadTest(loadFile):
    xorTest = XORTest()
    xorTest.nn = pyNEAT.NeuralNetwork(0)
-   xorTest.nn.load('nn.out')
+   xorTest.nn.load(loadFile)
    xorTest.evaluate(True, False)
 
 
 if __name__ == '__main__':
-   trainTest()
-   #loadTest()
+   loadFile = 'nn.out'
+   if len(sys.argv) > 1 and sys.argv[1] == 'load' and os.path.exists(loadFile):
+      loadTest(loadFile)
+   else:
+      trainTest()
