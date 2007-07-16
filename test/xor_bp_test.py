@@ -31,7 +31,7 @@ class XORTest(BackPropTester):
       BackPropTester.__init__(self, 'BP-XOR')
 
       self.inputs       = [[1.0, 0.0, 0.0], [1.0, 0.0, 1.0], [1.0, 1.0, 0.0], [1.0, 1.0, 1.0]]
-      self.targets      = [0.0, 1.0, 1.0, 0.0]
+      self.targets      = [[0.0], [1.0], [1.0], [0.0]]
 
       self.numHidden    = 2
       self.numOutputs   = 3

@@ -152,14 +152,14 @@ class BackPropTester:
          for j in range(networkDepth):
             self.nn.activate()
 
-         output = self.nn.outputs[0].output
+         output = [x.output for x in self.nn.outputs]
          self.outputs.append(output)
 
          if show:
             self.printOutput(self.inputs[i], self.targets[i], output)
 
          if backprop:
-            self.nn.backPropagate([self.targets[i]], learningRate)
+            self.nn.backPropagate(self.targets[i], learningRate)
 
          self.nn.clear()
 
