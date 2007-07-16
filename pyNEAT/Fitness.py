@@ -21,7 +21,7 @@ import math
 
 def getError(outputs, targets):
    if len(targets) != len(outputs):
-      raise Exception('Invalid number of targets')
+      raise Exception('Invalid number of targets (%d != %d)' % (len(targets), len(outputs)))
 
    error = 0.0
 
@@ -29,7 +29,7 @@ def getError(outputs, targets):
       output = outputs[i]
       target = targets[i]
       if len(output) != len(target):
-         raise Exception('Invalid target size')
+         raise Exception('Invalid target size (%d != %d)' % (len(target), len(output)))
       for j in range(len(target)):
          delta = output[j] - target[j]
          error += delta * delta
