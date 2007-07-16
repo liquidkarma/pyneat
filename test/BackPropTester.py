@@ -50,13 +50,15 @@ class BackPropTester:
       outputs = []
       all     = []
 
-      output = self.makeNeuron(pyNEAT.Neuron.OUTPUT, outputs, all)
+      for i in range(self.numOutputs):
+         self.makeNeuron(pyNEAT.Neuron.OUTPUT, outputs, all)
 
       for i in range(self.numHidden):
          hidden = self.makeNeuron(pyNEAT.Neuron.HIDDEN, hiddens, all)
-         self.synapses.append(pyNEAT.Synapse(hidden, output, pyNEAT.random_utils.randfloat()))
+         for output in outputs:
+            self.synapses.append(pyNEAT.Synapse(hidden, output, pyNEAT.random_utils.randfloat()))
 
-      for i in range(self.numOutputs):
+      for i in range(self.numInputs):
          input = self.makeNeuron(pyNEAT.Neuron.INPUT, inputs, all)
          for hidden in hiddens:
             self.synapses.append(pyNEAT.Synapse(input, hidden, pyNEAT.random_utils.randfloat()))

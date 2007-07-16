@@ -33,8 +33,9 @@ class XORTest(BackPropTester):
       self.inputs       = [[1.0, 0.0, 0.0], [1.0, 0.0, 1.0], [1.0, 1.0, 0.0], [1.0, 1.0, 1.0]]
       self.targets      = [[0.0], [1.0], [1.0], [0.0]]
 
+      self.numInputs    = len(self.inputs[0])
       self.numHidden    = 2
-      self.numOutputs   = 3
+      self.numOutputs   = 1
 
 def trainTest():
    xorTest = XORTest()
