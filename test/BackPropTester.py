@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 """
 pyNEAT
 Copyright (C) 2007 Brian Greer
@@ -19,22 +17,19 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-## This is a test case for the backprop algorithm included in pyNEAT
-
 import pyNEAT
-import sys
-import os.path
 import time
 
-class XORTest:
-   def __init__(self):
-      self.inputs       = [[1.0, 0.0, 0.0], [1.0, 0.0, 1.0], [1.0, 1.0, 0.0], [1.0, 1.0, 1.0]]
-      self.targets      = [0.0, 1.0, 1.0, 0.0]
-      self.outputs      = []
-      self.nextNeuronId = 1
+class BackPropTester:
+   def __init__(self, name):
+      self.name = name
+      self.ui   = pyNEAT.ExperimentUI(self)
 
-      self.name         = 'BP-XOR'
-      self.ui           = pyNEAT.ExperimentUI(self)
+      self.inputs  = []
+      self.targets = []
+      self.outputs = []
+
+      self.nextNeuronId = 1
 
    def makeNeuron(self, type, pool, all):
       neuron = pyNEAT.Neuron(self.nextNeuronId, type)
@@ -57,11 +52,11 @@ class XORTest:
 
       output = self.makeNeuron(pyNEAT.Neuron.OUTPUT, outputs, all)
 
-      for i in range(2):
+      for i in range(self.numHidden):
          hidden = self.makeNeuron(pyNEAT.Neuron.HIDDEN, hiddens, all)
          self.synapses.append(pyNEAT.Synapse(hidden, output, pyNEAT.random_utils.randfloat()))
 
-      for i in range(3):
+      for i in range(self.numOutputs):
          input = self.makeNeuron(pyNEAT.Neuron.INPUT, inputs, all)
          for hidden in hiddens:
             self.synapses.append(pyNEAT.Synapse(input, hidden, pyNEAT.random_utils.randfloat()))
@@ -187,21 +182,3 @@ class XORTest:
       for input in inputs:
          print input,
       print '] [', target, '] =', output
-
-def trainTest():
-   xorTest = XORTest()
-   xorTest.run(99.5)
-
-def loadTest(loadFile):
-   xorTest = XORTest()
-   xorTest.nn = pyNEAT.NeuralNetwork(0)
-   xorTest.nn.load(loadFile)
-   xorTest.evaluate(True, False)
-
-
-if __name__ == '__main__':
-   loadFile = 'nn.out'
-   if len(sys.argv) > 1 and sys.argv[1] == 'load' and os.path.exists(loadFile):
-      loadTest(loadFile)
-   else:
-      trainTest()
