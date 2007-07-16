@@ -68,7 +68,7 @@ class Neuron:
          for synapse in self.synapses:
             if synapse.enabled:
                if debug:
-                  print '\tinput=', synapse.input.getOutput(),
+                  print '\tinput =', synapse.input.getOutput(),
                if synapse.input == self:
                   output += self.output * synapse.weight
                else:
@@ -80,7 +80,7 @@ class Neuron:
          self.output = Activation.activate(output, Configuration.sigmoidSlope, Configuration.sigmoidConstant)
 
          if debug:
-            print '\toutput=', self.output
+            print '\toutput =', self.output
 
          self.activating = False
 

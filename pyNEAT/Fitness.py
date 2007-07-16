@@ -19,38 +19,34 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 import math
 
-def sumSquaredError(outputs, targets):
+def getError(outputs, targets):
    if len(targets) != len(outputs):
       raise Exception('Invalid number of targets')
 
    error = 0.0
 
    for i in range(len(targets)):
-      delta = outputs[i] - targets[i]
-      error += delta * delta
+      output = outputs[i]
+      target = targets[i]
+      if len(output) != len(target):
+         raise Exception('Invalid target size')
+      for j in range(len(target)):
+         delta = output[j] - target[j]
+         error += delta * delta
 
+   return error
+
+#def getError(outputs, targets):
+#   deltas = [map(lambda i, j: (i - j) * (i - j), x, y) for x, y in zip(outputs, targets)]
+#   return reduce(lambda x, y: x + y, deltas)
+
+def sumSquaredError(outputs, targets):
+   error = getError(outputs, targets)
    return math.sqrt(error)
 
 def rootMeanSquaredError(outputs, targets):
-   if len(targets) != len(outputs):
-      raise Exception('Invalid number of targets')
-
-   error = 0.0
-
-   for i in range(len(targets)):
-      delta = outputs[i] - targets[i]
-      error += delta * delta
-
+   error = getError(outputs, targets)
    return math.sqrt(error / len(targets))
 
 def meanError(outputs, targets):
-   if len(targets) != len(outputs):
-      raise Exception('Invalid number of targets')
-
-   error = 0.0
-
-   for i in range(len(targets)):
-      delta = outputs[i] - targets[i]
-      error += delta * delta
-
-   return error * 0.5
+   return getError(outputs, targets) * 0.5
