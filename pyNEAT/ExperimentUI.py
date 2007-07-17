@@ -35,19 +35,24 @@ class ExperimentUIBase:
       self.startTest(self.experiment.name)
 
       for run in self.experiment.getRuns():
+         self.handleRun(run)
+
          if not self.running:
             print 'Experiment terminated'
             break
-         else:
-            self.setRun(run.id)
-            self.setGeneration(run.generation)
-            self.setWinner(run.winner)
-            self.setHighestFitness(run.fitness)
-            self.setGenerationTime(run.time)
-            self.displayNetwork(run.champion, True)
-            self.displayOutputs(run.targets, run.outputs)
 
       self.endTest(self.experiment.name)
+
+      self.running = False
+
+   def handleRun(self, run):
+      self.setRun(run.id)
+      self.setGeneration(run.generation)
+      self.setWinner(run.winner)
+      self.setHighestFitness(run.fitness)
+      self.setGenerationTime(run.time)
+      self.displayNetwork(run.champion, True)
+      self.displayOutputs(run.targets, run.outputs)
 
 class ExperimentConsoleUI(ExperimentUIBase):
    def __init__(self, experiment):
@@ -193,6 +198,9 @@ if graphicsAvailable:
       def __init__(self, experiment):
          self.experiment = experiment
          self.running    = False
+         self._run       = None
+         self.lock       = threading.Lock()
+         self.event      = threading.Event()
 
          self.root = Tkinter.Tk()
 
@@ -295,12 +303,32 @@ if graphicsAvailable:
       def doRun(self):
          if not self.running:
             self.runButton.config(text='Stop')
-            #ExperimentUIBase.run(self)
             self.thread = threading.Thread(target=ExperimentUIBase.run, args=(self,))
             self.thread.start()
+            self.root.after(10, self.update)
          else:
             self.running = False
             self.runButton.config(text='Stopping', state=Tkinter.DISABLED)
+
+      def handleRun(self, run):
+         if self.running:
+            self.lock.acquire()
+            self._run = run
+            self.event.clear()
+            self.lock.release()
+
+            self.event.wait()
+
+      def update(self):
+         if self._run is not None:
+            self.lock.acquire()
+            ExperimentUIBase.handleRun(self, self._run)
+            self._run = None
+            self.event.set()
+            self.lock.release()
+
+         if self.running:
+            self.root.after(10, self.update)
 
       def setRun(self, run):
          self.status.setRun(run)
