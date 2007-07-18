@@ -354,9 +354,14 @@ if graphicsAvailable:
          neurons     = {}
          connections = []
          for neuron in network.allNeurons:
-            layer = neuron.getMaxDepth()
-            # cull disconnected neurons
-            #if layer > 0 or (layer == 0 and neuron in network.inputs):
+            #layer = neuron.getMaxDepth()
+            if neuron in network.inputs:
+               layer = 0
+            elif neuron in network.outputs:
+               layer = 2
+            else:
+               layer = 1
+
             for synapse in neuron.synapses:
                connections.append((synapse.input.id, synapse.weight, neuron.id))
             if layer not in neurons:
@@ -366,7 +371,7 @@ if graphicsAvailable:
          numLayers = len(neurons)
 
          maxLength = 0
-         for layer, ids in neurons.iteritems():
+         for ids in neurons.itervalues():
             if len(ids) > maxLength:
                maxLength = len(ids)
 
@@ -378,7 +383,7 @@ if graphicsAvailable:
          coords = {}
          yDelta = canvasHeight / numLayers
          y      = canvasHeight - (yDelta + neuronDiameter) / 2
-         for layer, ids, in neurons.iteritems():
+         for ids in neurons.itervalues():
             ids.sort()
             xDelta = canvasWidth / len(ids)
             x      = (xDelta - neuronDiameter) / 2;

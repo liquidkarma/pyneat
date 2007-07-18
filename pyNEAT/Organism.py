@@ -33,8 +33,6 @@ class Organism:
       self.populationChampionChild = False
 
       self.speciesChampion         = False
-
-      self.network                 = genome.genesis(genome.id)
       self.outputs                 = None
 
    # descending order of fitness
@@ -45,5 +43,7 @@ class Organism:
       return self.genome.isCompatibleWith(organism.genome)
 
    def setId(self, id):
-      self.genome.id  = id
-      self.network.id = id
+      self.genome.id = id
+
+   def getNetwork(self):
+      return self.genome.genesis(self.genome.id)

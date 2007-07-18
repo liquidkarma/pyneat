@@ -359,13 +359,12 @@ class Genome:
 
             if mutateGene.enabled:
                # make sure we don't isolate a neuron by disabling this gene
-               valid = False
                for gene in self.genes:
-                  if mutateGene.input == gene.input and gene.enabled and mutateGene.innovation != gene.innovation:
-                     valid = True
+                  if mutateGene.input.id == gene.input.id and \
+                     gene.enabled and \
+                     mutateGene.innovation != gene.innovation:
+                     mutateGene.enabled = False
                      break
-               if valid:
-                  mutateGene.enabled = False
             else:
                mutateGene.enabled = True
 
@@ -383,7 +382,7 @@ class Genome:
          checking = False
          for gene in self.genes:
             if checking:
-               if randfloat() < 0.3:
+               if randfloat() > 0.3 and gene.synapse.input.type != Neuron.BIAS:
                   splitGene = gene
                   break
             elif gene.enabled and gene.synapse.input.type != Neuron.BIAS:
@@ -395,7 +394,8 @@ class Genome:
             if self.genes[index].enabled and self.genes[index].synapse.input.type != Neuron.BIAS:
                splitGene = self.genes[index]
                break
-            tryCount += 1
+            else:
+               tryCount += 1
 
       if splitGene is not None:
          splitGene.enabled = False
@@ -780,6 +780,15 @@ class Genome:
                disabled = False
 
             babyGenes.append(newGene)
+
+      # TODO:
+      # make sure all possible input, output, and bias neurons are replicated to children
+      # this allows disconnected nodes to survive crossover
+      # see the NEAT FAQ for more info
+      # TODO: should also add mutateAddInput above if this is used
+      #for neuron in self.neurons:
+      #   if neuron.type == Neuron.INPUT or neuron.type == Neuron.BIAS or neuron.type == Neuron.OUTPUT:
+      #      self.addNeuron(neuron, babyNeurons, babyTraits)
 
       # TODO: should validate the network here to make sure there is at least
       # one path from at least one input to at least one output

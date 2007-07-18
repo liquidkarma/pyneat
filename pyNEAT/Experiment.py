@@ -75,11 +75,11 @@ class Experiment:
       self.population.epoch(generation, self)
 
       if self.population.champion.winner:
-         run.winner = self.population.champion.network.id
+         run.winner = self.population.champion.genome.id
       else:
          run.winner = None
 
-      run.champion = self.population.champion.network
+      run.champion = self.population.champion.getNetwork()
       run.fitness  = self.population.highestFitness
       run.targets  = self.targets
       run.outputs  = self.population.champion.outputs

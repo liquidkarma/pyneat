@@ -98,7 +98,7 @@ class Population:
 
    def epoch(self, generation, experiment, debug=True):
       for organism in self.organisms:
-         fitness, outputs, error, won = experiment.evaluate(organism.network)
+         fitness, outputs, error, won = experiment.evaluate(organism.getNetwork())
 
          organism.fitness = fitness
          organism.outputs = outputs
