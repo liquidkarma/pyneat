@@ -122,7 +122,7 @@ class Population:
          specie.calcFitnessStats()
          specie.adjustFitness()
 
-      totalFitness = 0
+      totalFitness = 0.0
       for organism in self.organisms:
          totalFitness += organism.fitness
 
@@ -227,7 +227,7 @@ class Population:
                   stolenBabies += specie.expectedOffspring - 1
                   specie.expectedOffspring = 1
 
-                  if stolenBabies >= Configurtion.babiesStolen:
+                  if stolenBabies >= Configuration.babiesStolen:
                      break
 
          oneFifthStolen = Configuration.babiesStolen / 5

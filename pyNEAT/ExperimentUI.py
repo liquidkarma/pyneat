@@ -212,6 +212,8 @@ if graphicsAvailable:
          self._addCanvas()
          self._addStatusBar()
 
+         self.fitnesses = []
+
       def _addMenus(self):
          menu = Tkinter.Menu(self.root)
          self.root.config(menu=menu)
@@ -244,8 +246,11 @@ if graphicsAvailable:
          frame = Tkinter.Frame(self.root)
          frame.pack(fill=Tkinter.BOTH, expand=1)
 
-         self.canvas = Tkinter.Canvas(frame, bg='blue')
-         self.canvas.pack(side=Tkinter.LEFT, fill=Tkinter.BOTH, expand=1)
+         self.netCanvas = Tkinter.Canvas(frame, bg='blue')
+         self.netCanvas.pack(side=Tkinter.TOP, fill=Tkinter.X, expand=1)
+
+         self.fitnessCanvas = Tkinter.Canvas(frame, bg='black')
+         self.fitnessCanvas.pack(side=Tkinter.LEFT, fill=Tkinter.X, expand=1)
 
          outputFrame = Tkinter.Frame(frame)
          outputFrame.pack(side=Tkinter.RIGHT, fill=Tkinter.BOTH, expand=1)
@@ -266,7 +271,7 @@ if graphicsAvailable:
       def doStartGenes(self):
          file = tkFileDialog.askopenfilename(initialfile=self.experiment.startGenesFileName)
          if file:
-            print 'setting start genes to file:', file
+            print 'Setting start genes to file:', file
             self.experiment.startGenesFileName = file
 
       def doOptions(self):
@@ -275,16 +280,16 @@ if graphicsAvailable:
       def doSaveOptions(self):
          file = tkFileDialog.asksaveasfilename()
          if file:
-            print 'saving configuration as', file
+            print 'Saving configuration as', file
             printConfiguration(file)
 
       def openNetwork(self):
          file = tkFileDialog.askopenfilename()
          if file:
-            print 'opening network', file
+            print 'Opening network', file
 
       def showAbout(self):
-         tkMessageBox.showinfo('About', 'pyNEAT by Brian Greer\nBased on the NEAT algorithm by Ken Stanley')
+         tkMessageBox.showinfo('About', 'pyNEAT by Brian Greer\nNEAT algorithm by Ken Stanley\nhttp://code.google.com/p/pyneat')
 
       def openCallback(self):
          file = tkFileDialog.askopenfilename()
@@ -342,14 +347,52 @@ if graphicsAvailable:
       def setHighestFitness(self, fitness):
          self.status.setHighestFitness(fitness)
 
+         self.fitnesses.append(fitness)
+
+         self.fitnessCanvas.delete(Tkinter.ALL)
+
+         fitnessCanvasWidth  = self.fitnessCanvas.winfo_width()
+         fitnessCanvasHeight = self.fitnessCanvas.winfo_height()
+
+         maxFitness = 0.0
+         for fitness in self.fitnesses:
+            if fitness > maxFitness:
+               maxFitness = fitness
+
+         maxFitness *= 2.0
+
+         if maxFitness > 0:
+            yFact = fitnessCanvasHeight / maxFitness
+         else:
+            yFact = 0
+
+         numFitnessPoints = len(self.fitnesses)
+         if numFitnessPoints < 50:
+            numFitnessPoints = 60
+         else:
+            numFitnessPoints += 10
+
+         xStep = fitnessCanvasWidth / numFitnessPoints
+
+         x0 = 0
+         y0 = fitnessCanvasHeight - 1
+         for fitness in self.fitnesses:
+            x1 = x0 + xStep
+            y1 = fitnessCanvasHeight - fitness * yFact - 1
+            self.fitnessCanvas.create_line(x0, y0, x1, y1, fill='red')
+            x0 = x1
+            y0 = y1
+
+         self.netCanvas.update_idletasks()
+
       def setWinner(self, winner):
          self.status.setWinner(winner)
 
       def displayNetwork(self, network, showWeights):
-         self.canvas.delete(Tkinter.ALL)
+         self.netCanvas.delete(Tkinter.ALL)
 
-         canvasWidth  = self.canvas.winfo_width()
-         canvasHeight = self.canvas.winfo_height()
+         netCanvasWidth  = self.netCanvas.winfo_width()
+         netCanvasHeight = self.netCanvas.winfo_height()
 
          neurons     = {}
          connections = []
@@ -376,21 +419,21 @@ if graphicsAvailable:
                maxLength = len(ids)
 
          if maxLength > numLayers:
-            neuronDiameter = canvasWidth / (maxLength + maxLength - 1)
+            neuronDiameter = netCanvasHeight / (maxLength + maxLength - 1)
          else:
-            neuronDiameter = canvasHeight / (numLayers + numLayers - 1)
+            neuronDiameter = netCanvasHeight / (numLayers + numLayers - 1)
 
          coords = {}
-         yDelta = canvasHeight / numLayers
-         y      = canvasHeight - (yDelta + neuronDiameter) / 2
+         yDelta = netCanvasHeight / numLayers
+         y      = netCanvasHeight - (yDelta + neuronDiameter) / 2
          for ids in neurons.itervalues():
             ids.sort()
-            xDelta = canvasWidth / len(ids)
+            xDelta = netCanvasWidth / len(ids)
             x      = (xDelta - neuronDiameter) / 2;
             for id in ids:
                coords[id] = (x + neuronDiameter / 2, y)
-               self.canvas.create_oval(x, y, x + neuronDiameter - 1, y + neuronDiameter - 1, fill='red')
-               self.canvas.create_text(x + neuronDiameter / 2, y + neuronDiameter / 2, text=id)
+               self.netCanvas.create_oval(x, y, x + neuronDiameter - 1, y + neuronDiameter - 1, fill='red')
+               self.netCanvas.create_text(x + neuronDiameter / 2, y + neuronDiameter / 2, text=id)
                x += xDelta
             y -= yDelta
 
@@ -418,15 +461,15 @@ if graphicsAvailable:
                   usedConnections[(inputId, outputId)] += 1
                   xi = (x0 + x1) / 2 + (width + width) * (-1 ** count);
                   yi = (y0 + y1) / 2 + (width + width) * (-1 ** count);
-                  self.canvas.create_line(x0, y0, xi, yi, x1, y1, width=width, stipple=stipple, smooth=True, arrow=Tkinter.LAST)
+                  self.netCanvas.create_line(x0, y0, xi, yi, x1, y1, width=width, stipple=stipple, smooth=True, arrow=Tkinter.LAST)
                else:
-                  self.canvas.create_line(x0, y0, x1, y1, width=width, stipple=stipple, arrow=Tkinter.LAST)
+                  self.netCanvas.create_line(x0, y0, x1, y1, width=width, stipple=stipple, arrow=Tkinter.LAST)
                   usedConnections[(inputId, outputId)] = 1
 
                if weight > 0:
-                  self.canvas.create_text((x0 + x1) / 2, (y0 + y1) / 2, text='%.4f' % weight, fill='white')
+                  self.netCanvas.create_text((x0 + x1) / 2, (y0 + y1) / 2, text='%.4f' % weight, fill='white')
 
-         self.canvas.update_idletasks()
+         self.netCanvas.update_idletasks()
 
          print 'Network', network.id
          for neuron in network.allNeurons:
@@ -444,6 +487,7 @@ if graphicsAvailable:
       def startTest(self, name):
          self.root.title('pyNEAT - ' + name)
          self.status.setRunning(True)
+         self.fitnesses = []
 
       def endTest(self, name):
          self.status.setRunning(False)
