@@ -305,15 +305,16 @@ class Population:
 
       self.innovations = []
 
-      # make sure the best species did not die accidentally
-      found = False
-      for specie in self.species:
-         if specie.id == bestSpeciesId:
-            found = True
-            break;
+      if debug:
+         # make sure the best species did not die accidentally
+         found = False
+         for specie in self.species:
+            if specie.id == bestSpeciesId:
+               found = True
+               break;
 
-      if debug and not found:
-         print "ERROR: Best species died!"
+         if not found:
+            print "ERROR: Best species died!"
 
    def getNextInnovationId(self, inc=1):
       id = self.currentInnovationId

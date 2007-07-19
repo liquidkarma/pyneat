@@ -207,6 +207,8 @@ if graphicsAvailable:
          self.root.title('pyNEAT')
          self.root.geometry('800x600')
 
+         self.root.protocol('WM_DELETE_WINDOW', self.doDestroy)
+
          self._addMenus()
          self._addToolBar()
          self._addCanvas()
@@ -301,6 +303,10 @@ if graphicsAvailable:
          if file:
             print 'saving as', file
 
+      def doDestroy(self):
+         self.running = False
+         self.root.destroy()
+
       def doQuit(self):
          self.running = False
          self.root.quit()
@@ -354,15 +360,24 @@ if graphicsAvailable:
          fitnessCanvasWidth  = self.fitnessCanvas.winfo_width()
          fitnessCanvasHeight = self.fitnessCanvas.winfo_height()
 
+         minFitness = 99999.0
          maxFitness = 0.0
          for fitness in self.fitnesses:
+            if fitness < minFitness:
+               minFitness = fitness
             if fitness > maxFitness:
                maxFitness = fitness
 
-         maxFitness *= 2.0
+         #yRange = (maxFitness - minFitness) * 2
 
+         #if yRange > 0:
+         #   if yRange < 1:
+         #      yFact = fitnessCanvasHeight / 2 - fitnessCanvasHeight * yRange
+         #   else:
+         #      yFact = fitnessCanvasHeight / 2 - fitnessCanvasHeight / yRange
+         #elif maxFitness > 0:
          if maxFitness > 0:
-            yFact = fitnessCanvasHeight / maxFitness
+            yFact = fitnessCanvasHeight / (3 * maxFitness / 2)
          else:
             yFact = 0
 
@@ -378,7 +393,7 @@ if graphicsAvailable:
          y0 = fitnessCanvasHeight - 1
          for fitness in self.fitnesses:
             x1 = x0 + xStep
-            y1 = fitnessCanvasHeight - fitness * yFact - 1
+            y1 = fitnessCanvasHeight - 1 - fitness * yFact
             self.fitnessCanvas.create_line(x0, y0, x1, y1, fill='red')
             x0 = x1
             y0 = y1
@@ -418,10 +433,15 @@ if graphicsAvailable:
             if len(ids) > maxLength:
                maxLength = len(ids)
 
-         if maxLength > numLayers:
-            neuronDiameter = netCanvasHeight / (maxLength + maxLength - 1)
+         if netCanvasHeight < netCanvasWidth:
+            smallCanvasDim = netCanvasHeight
          else:
-            neuronDiameter = netCanvasHeight / (numLayers + numLayers - 1)
+            smallCanvasDim = netCanvasWidth
+
+         if maxLength > numLayers:
+            neuronDiameter = smallCanvasDim / (maxLength + maxLength - 1)
+         else:
+            neuronDiameter = smallCanvasDim / (numLayers + numLayers - 1)
 
          coords = {}
          yDelta = netCanvasHeight / numLayers
