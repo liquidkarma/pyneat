@@ -20,6 +20,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 from distutils.core import setup
 
 setup(name='pyNEAT',
-      version='0.1',
+      version='0.0.0',
       packages=['pyNEAT']
 )
