@@ -19,15 +19,15 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-## Real-time NEAT test
+## Real-time ant farm
 
 import Tkinter
 import pyNEAT
 import random
 
-class Avatar:
-   def __init__(self, x, y, map):
-      self.map = map
+class Ant:
+   def __init__(self, x, y, hill):
+      self.hill = hill
 
       self.reset(x, y)
 
@@ -52,8 +52,8 @@ class Avatar:
       depth = network.getMaxDepth()
 
       network.clear()
-      network.setInput([1.0] + self.map.getGrid(self.x, self.y))
-      #network.setInput([1.0] + self.map.map)
+      network.setInput([1.0] + self.hill.getGrid(self.x, self.y))
+      #network.setInput([1.0] + self.hill.hill)
       network.activate()
       for i in range(depth):
          network.activate()
@@ -70,23 +70,23 @@ class Avatar:
 
       if maxIndex >= 0:
          x, y = self.directions[maxIndex]
-         self.x, self.y = self.map.move(self.x, self.y, x, y)
-         type = self.map.map[self.map.getIndex(self.x, self.y)]
-         if type == RTMap.BASE:
+         self.x, self.y = self.hill.move(self.x, self.y, x, y)
+         type = self.hill.hill[self.hill.getIndex(self.x, self.y)]
+         if type == AntHill.BASE:
             self.active  = False
             self.fitness = 1.0
-         elif type == RTMap.MINE:
+         elif type == AntHill.MINE:
             self.active  = False
             self.fitness = 0.0
 
-class RTMap:
-   START       = 1
-   BASE        = 2
-   MINE        = 3
+class AntHill:
+   START     = 1
+   BASE      = 2
+   MINE      = 3
 
-   NUM_BASES   = 3
-   NUM_MINES   = 6
-   NUM_AVATARS = 5
+   NUM_BASES = 3
+   NUM_MINES = 6
+   NUM_ANTS  = 5
 
    TIMEOUT     = 50 # TODO: this should not be static; should be determined per generation
 
@@ -100,35 +100,35 @@ class RTMap:
       self.reset()
 
    def reset(self):
-      self.map = [0 for i in range(self.size)]
-      self.map[0]    = RTMap.START
-      self.map[1:4]  = RTMap.NUM_BASES * [RTMap.BASE]
-      self.map[4:10] = RTMap.NUM_MINES * [RTMap.MINE]
+      self.hill = [0 for i in range(self.size)]
+      self.hill[0]    = AntHill.START
+      self.hill[1:4]  = AntHill.NUM_BASES * [AntHill.BASE]
+      self.hill[4:10] = AntHill.NUM_MINES * [AntHill.MINE]
 
-      random.shuffle(self.map)
+      random.shuffle(self.hill)
 
       for i in range(self.size):
-         if self.map[i] == RTMap.START:
+         if self.hill[i] == AntHill.START:
             self.startX = i % self.width
             self.startY = i / self.width
             break
 
-      self.population = pyNEAT.Population(pyNEAT.Genome(fileName='rtstartgenes'), RTMap.NUM_AVATARS)
+      self.population = pyNEAT.Population(pyNEAT.Genome(fileName='antstartgenes'), AntHill.NUM_ANTS)
       self.generation = 1
       self.time       = 0
-      self.avatars    = [Avatar(self.startX, self.startY, self) for i in range(RTMap.NUM_AVATARS)]
+      self.ants       = [Ant(self.startX, self.startY, self) for i in range(AntHill.NUM_ANTS)]
 
    def update(self):
       regen = False
       self.time += 1
 
-      if self.time >= RTMap.TIMEOUT:
+      if self.time >= AntHill.TIMEOUT:
          regen = True
       else:
          regen = True
-         for i in range(RTMap.NUM_AVATARS):
-            if self.avatars[i].active:
-               self.avatars[i].update(self.population.organisms[i].getNetwork())
+         for i in range(AntHill.NUM_ANTS):
+            if self.ants[i].active:
+               self.ants[i].update(self.population.organisms[i].getNetwork())
                regen = False
 
       if regen:
@@ -139,13 +139,13 @@ class RTMap:
       self.population.epoch(self.generation, self)
       self.generation += 1
 
-      for avatar in self.avatars:
-         avatar.reset(self.startX, self.startY)
+      for ant in self.ants:
+         ant.reset(self.startX, self.startY)
 
    def evaluate(self, network):
-      for i in range(RTMap.NUM_AVATARS):
+      for i in range(AntHill.NUM_ANTS):
          if self.population.organisms[i].getNetwork().id == network.id:
-            fitness = self.avatars[i].fitness
+            fitness = self.ants[i].fitness
             winner  = (fitness == 1.0)
             error   =  1.0 - fitness
             return fitness, [], error, winner
@@ -159,20 +159,20 @@ class RTMap:
       tileHeight   = canvasHeight / self.height
 
       for i in range(self.size):
-         t = self.map[i]
-         if t == RTMap.START:
+         t = self.hill[i]
+         if t == AntHill.START:
             x, y = self.getCoords(i, tileWidth, tileHeight)
             self.drawCircle(canvas, x, y, tileWidth, tileHeight)
-         elif t == RTMap.BASE:
+         elif t == AntHill.BASE:
             x, y = self.getCoords(i, tileWidth, tileHeight)
             self.drawTriangle(canvas, x, y, tileWidth, tileHeight)
-         elif t == RTMap.MINE:
+         elif t == AntHill.MINE:
             x, y = self.getCoords(i, tileWidth, tileHeight)
             self.drawRectangle(canvas, x, y, tileWidth, tileHeight)
 
-      for avatar in self.avatars:
-         if avatar.active:
-            i    = self.getIndex(avatar.x, avatar.y)
+      for ant in self.ants:
+         if ant.active:
+            i    = self.getIndex(ant.x, ant.y)
             x, y = self.getCoords(i, tileWidth, tileHeight)
             self.drawCircle(canvas, x, y, tileWidth, tileHeight, fill='yellow')
 
@@ -190,21 +190,21 @@ class RTMap:
          grid = []
          if i >= self.width:
             start = i - self.width
-            grid += self.map[start:start + 3]
+            grid += self.hill[start:start + 3]
          else:
             grid += 3 * [-1]
          if i > 0:
-            grid.append(self.map[i - 1])
+            grid.append(self.hill[i - 1])
          else:
             grid.append(-1)
-         #grid.append(self.map[i])
+         #grid.append(self.hill[i])
          if i < (self.size - 1):
-            grid.append(self.map[i + 1])
+            grid.append(self.hill[i + 1])
          else:
             grid.append(-1)
          if i < (self.size - self.width):
             start = i + self.width - 1
-            grid += self.map[start:start + 3]
+            grid += self.hill[start:start + 3]
          else:
             grid += 3 * [-1]
          return grid
@@ -225,17 +225,17 @@ class RTMap:
 
    def getFitness(self, x, y):
       i = self.getIndex(x, y)
-      if self.map[i] == RTMap.BASE:
+      if self.hill[i] == AntHill.BASE:
          return 1.0
-      elif self.map[i] == RTMap.MINE:
+      elif self.hill[i] == AntHill.MINE:
          return 0.0
       else:
          fitness = 0.5
          grid    = self.getGrid(x, y)
          for x in grid:
-            if x == RTMap.MINE:
+            if x == AntHill.MINE:
                fitness -= 0.125
-            elif x == RTMap.BASE:
+            elif x == AntHill.BASE:
                fitness += 0.25
          return fitness
 
@@ -248,7 +248,7 @@ class RTMap:
    def drawRectangle(self, canvas, x, y, width, height):
       canvas.create_rectangle(x, y, x + width, y + height, fill='green')
 
-class RTApp:
+class AntHillApp:
    def __init__(self):
       self.root = Tkinter.Tk()
       self.root.title('pyNEAT - Real-time Test')
@@ -259,7 +259,7 @@ class RTApp:
       self._addCanvas()
       self._addStatusBar()
 
-      self.map = RTMap()
+      self.hill = AntHill()
 
       self.pause = False
 
@@ -292,7 +292,7 @@ class RTApp:
       self.canvas.pack(side=Tkinter.LEFT, fill=Tkinter.BOTH, expand=1)
 
    def _addStatusBar(self):
-      self.status = RTStatusBar(self.root)
+      self.status = AntStatusBar(self.root)
       self.status.pack(side=Tkinter.BOTTOM, fill=Tkinter.X)
 
    def registerUpdateHandler(self):
@@ -300,11 +300,11 @@ class RTApp:
 
    def update(self):
       self.canvas.delete(Tkinter.ALL)
-      self.map.draw(self.canvas)
+      self.hill.draw(self.canvas)
       self.canvas.update_idletasks()
       if not self.pause:
          self.registerUpdateHandler()
-      self.map.update()
+      self.hill.update()
 
    def doPause(self):
       self.pause = not self.pause
@@ -315,12 +315,12 @@ class RTApp:
          self.registerUpdateHandler()
 
    def doReset(self):
-      self.map.reset()
+      self.hill.reset()
 
    def run(self):
       self.root.mainloop()
 
-class RTStatusBar(Tkinter.Frame):
+class AntStatusBar(Tkinter.Frame):
    def __init__(self, master):
       Tkinter.Frame.__init__(self, master)
 
@@ -336,6 +336,6 @@ class RTStatusBar(Tkinter.Frame):
       label.update_idletasks()
 
 if __name__ == '__main__':
-   pyNEAT.loadConfiguration('rt.ne')
-   app = RTApp()
+   pyNEAT.loadConfiguration('ants.ne')
+   app = AntHillApp()
    app.run()

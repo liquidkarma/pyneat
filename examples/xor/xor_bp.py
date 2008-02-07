@@ -19,12 +19,13 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-## This is an XOR test case for the backprop algorithm included in pyNEAT
+## This is examples learns XOR using the backprop algorithm included in pyNEAT
 
 import sys
 import os.path
 import pyNEAT
-from BackPropTester import BackPropTester
+
+from pyNEAT.BackPropTester import BackPropTester
 
 pyNEAT.Configuration.printEvery = 100
 
