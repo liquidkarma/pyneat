@@ -1,5 +1,11 @@
-populationSize             = 1000
-numSpeciesTarget           = 100
-#enforceDiversification     = 1
-numGenerations             = 10000
-mutateAddNeuronProbability = 0.1
+populationSize                  = 1000
+numSpeciesTarget                = 100
+#enforceDiversification          = 1
+numGenerations                  = 10000
+mutateAddNeuronProbability      = 0.05
+mutateToggleEnableProbability   = 0.0
+mutateGeneReenableProbability   = 0.0
+compatibilityThreshold          = 3.0
+babiesStolen                    = 0
+mutateSynapseWeightsProbability = 0.5
+recurrentProbability            = 0.0

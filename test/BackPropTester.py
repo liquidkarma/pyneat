@@ -92,13 +92,9 @@ class BackPropTester:
       while fitness < self.fitnessThreshold:
          count += 1
 
-         show = False
-         #if (count % 100) == 0:
-         #   show = True
+         fitness = self.evaluate(False, True, learningRate)
 
-         fitness = self.evaluate(show, True, learningRate)
-
-         if (count % 100) == 0:
+         if (count % pyNEAT.Configuration.printEvery) == 0:
             runCount += 1
             run = pyNEAT.Run(runCount, 0)
 
@@ -143,27 +139,7 @@ class BackPropTester:
       self.nn.dump('nn.out')
 
    def evaluate(self, show=False, backprop=True, learningRate=0.3):
-      networkDepth = self.nn.getMaxDepth()
-
-      self.outputs = []
-
-      for i in range(len(self.inputs)):
-         self.nn.setInput(self.inputs[i])
-
-         self.nn.activate()
-         for j in range(networkDepth):
-            self.nn.activate()
-
-         output = [x.output for x in self.nn.outputs]
-         self.outputs.append(output)
-
-         if show:
-            self.printOutput(self.inputs[i], self.targets[i], output)
-
-         if backprop:
-            self.nn.backPropagate(self.targets[i], learningRate)
-
-         self.nn.clear()
+      self.outputs = self.nn.activate(inputs=self.inputs, showStep=show, backprop=backprop, learningRate=learningRate)
 
       sse  = pyNEAT.Fitness.sumSquaredError(self.outputs, self.targets)
       rmse = pyNEAT.Fitness.rootMeanSquaredError(self.outputs, self.targets)
@@ -178,9 +154,3 @@ class BackPropTester:
          print 'fitness =', fitness
 
       return fitness
-
-   def printOutput(self, inputs, target, output):
-      print '[',
-      for input in inputs:
-         print input,
-      print '] [', target, '] =', output

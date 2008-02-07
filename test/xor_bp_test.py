@@ -23,8 +23,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 import sys
 import os.path
-
+import pyNEAT
 from BackPropTester import BackPropTester
+
+pyNEAT.Configuration.printEvery = 100
 
 class XORTest(BackPropTester):
    def __init__(self):

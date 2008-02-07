@@ -128,7 +128,7 @@ class RTMap:
          regen = True
          for i in range(RTMap.NUM_AVATARS):
             if self.avatars[i].active:
-               self.avatars[i].update(self.population.organisms[i].network)
+               self.avatars[i].update(self.population.organisms[i].getNetwork())
                regen = False
 
       if regen:
@@ -144,7 +144,7 @@ class RTMap:
 
    def evaluate(self, network):
       for i in range(RTMap.NUM_AVATARS):
-         if self.population.organisms[i].network.id == network.id:
+         if self.population.organisms[i].getNetwork().id == network.id:
             fitness = self.avatars[i].fitness
             winner  = (fitness == 1.0)
             error   =  1.0 - fitness

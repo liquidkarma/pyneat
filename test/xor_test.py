@@ -33,25 +33,17 @@ class XORTest(pyNEAT.Experiment):
       self.targets = [0.0, 1.0, 1.0, 0.0]
 
    def evaluate(self, network):
-      networkDepth = network.getMaxDepth()
-
-      outputs = []
-
-      for input in self.inputs:
-         network.setInput(input)
-         network.activate()
-         for j in range(networkDepth):
-            network.activate()
-         outputs.append(network.outputs[0].output)
-         network.clear()
-
+      outputs  = network.activate(inputs=self.inputs)
       errorSum = 0
       winner   = True
 
       for i in range(len(self.targets)):
-         errorSum += math.fabs(outputs[i] - self.targets[i])
-         if (self.targets[i] > 0.5 and outputs[i] < 0.5) or \
-            (self.targets[i] < 0.5 and outputs[i] > 0.5):
+         target = self.targets[i]
+         output = outputs[i][0]
+
+         errorSum += math.fabs(output - target)
+         if (target > 0.5 and output < 0.5) or \
+            (target < 0.5 and output > 0.5):
             winner = False
 
       fitness = (4.0 - errorSum) ** 2

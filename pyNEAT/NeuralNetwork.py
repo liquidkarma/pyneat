@@ -32,10 +32,34 @@ class NeuralNetwork:
       self.genotype   = None
       self.depth      = -1
 
-   def activate(self, debug=False):
-      for neuron in self.allNeurons:
-         if neuron.active:
-            neuron.activate(debug)
+   def activate(self, debug=False, showStep=False, inputs=None, targets=None, backprop=False, learningRate=0.3):
+      if inputs is None or len(inputs) == 0:
+         for neuron in self.allNeurons:
+            if neuron.active:
+               neuron.activate(debug)
+      else:
+         networkDepth = self.getMaxDepth()
+
+         outputs = []
+
+         for i in range(len(inputs)):
+            self.setInput(inputs[i])
+            self.activate(debug=debug)
+            for j in range(networkDepth):
+               self.activate(debug=debug)
+
+            output = [x.output for x in self.outputs]
+            outputs.append(output)
+
+            if showStep and targets is not None:
+               self.printStep(inputs[i], targets[i], output)
+
+            if backprop and targets is not None:
+               self.backPropagate(targets[i], learningRate)
+
+            self.clear()
+
+         return outputs
 
    def isRecurrent(self, input, output, count, threshold):
       if count > threshold:
@@ -58,6 +82,12 @@ class NeuralNetwork:
                print '\t', synapse.input.id, '-(', synapse.weight, ')->', neuron.id
             else:
                print '\t', synapse.input.id, '->', neuron.id
+
+   def printStep(self, inputs, target, output):
+      print '[',
+      for input in inputs:
+         print input,
+      print '] [', target, '] =', output
 
    def getMaxDepth(self):
       if self.depth < 0:

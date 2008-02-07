@@ -1,21 +1,28 @@
 * configuration for dumping overall champion to a file everytime a new champion is discovered
-* should not consider invalid networks?
-   - networks with no connections to output
-* cull hidden nodes with no out synapses?
-   - output signal will never propagate to the output layer
+* configuration for dumping stats to a file for later graphing (csv, xml)
 * gui
    - recurrent connection drawing
-   - open existing network file for display
+   - save currently shown network
+   - open network file for display
+   - running fitness graph (current, best, per-species)
+   - show winner, next to current best
    - should be able to monitor/control parallel jobs (Linda) through interface
 * use python logging module for console output?
    - possibly get rid of 'if debug' stuff
+   - configuration for log file, debug level, etc
 * features
-   - hyperneat
+   - hyperneat support (CPPN support)
+      - object visualization experiment from gauci paper
    - adaptive synapses
    - Q learning
    - temporal delay, signal delay
       - leaky [integrator] neurons
       - Continuous Time Recurrent Neural Networks (CTRNNs)
+   - quickprop
+   - genetic art interface
+      - PIL?
+* xml input/output support for the nn
 * more examples
 * testing
 * optimize
+* there should be at least one path from at least one input node to at least one output node

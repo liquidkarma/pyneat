@@ -31,7 +31,10 @@ if __name__ == '__main__':
       numHidden  = int(sys.argv[2])
       numOutputs = int(sys.argv[3])
 
-      numConnections = (numInputs + 1) * numHidden + numHidden * numOutputs
+      if numHidden > 0:
+         numConnections = (numInputs + 1) * numHidden + numHidden * numOutputs
+      else:
+         numConnections = (numInputs + 1) * numOutputs
 
       print 'genomestart 1'
 
@@ -50,14 +53,21 @@ if __name__ == '__main__':
          print 'node', i, '0 0 2'
 
       gene = 1
-      for i in range(1, 2 + numInputs):
-         for j in range(2 + numInputs, 2 + numInputs + numHidden):
-            print 'gene', gene, i, j, '0.5 0', gene, '0 1'
-            gene += 1
 
-      for i in range(2 + numInputs, 2 + numInputs + numHidden):
-         for j in range(2 + numInputs + numHidden, 2 + numInputs + numHidden + numOutputs):
-            print 'gene', gene, i, j, '0.5 0', gene, '0 1'
-            gene += 1
+      if numHidden > 0:
+         for i in range(1, 2 + numInputs):
+            for j in range(2 + numInputs, 2 + numInputs + numHidden):
+               print 'gene', gene, i, j, '0.5 0', gene, '0 1'
+               gene += 1
+
+         for i in range(2 + numInputs, 2 + numInputs + numHidden):
+            for j in range(2 + numInputs + numHidden, 2 + numInputs + numHidden + numOutputs):
+               print 'gene', gene, i, j, '0.5 0', gene, '0 1'
+               gene += 1
+      else:
+         for i in range(1, 2 + numInputs):
+            for j in range(2 + numInputs, 2 + numInputs + numOutputs):
+               print 'gene', gene, i, j, '0.5 0', gene, '0 1'
+               gene += 1
 
       print 'genomeend 1'
