@@ -1,0 +1,3 @@
+NEAT stands for NeuroEvolution of Augmenting Topologies. It was invented by Ken Stanley, who is currently teaching at the University of Central Florida. More information including papers on NEAT and many other implementations in other languages can be found on his web site: http://www.cs.ucf.edu/~kstanley/
+
+There is also a Wikipedia page for NEAT: http://en.wikipedia.org/wiki/NeuroEvolution_of_Augmented_Topologies

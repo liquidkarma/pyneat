@@ -1,0 +1,1 @@
+Python package for training/evolving neural networks using the NEAT algorithm by Ken Stanley (http://www.cs.ucf.edu/~kstanley/).
